@@ -58,7 +58,8 @@ def Boling_Point_Elevation(xf:float,P1: float):
     T1= (Tw+BPE)+273.15 #Boiling point of the solution at P1 (K)
     print(f"Boiling Point Elevation (BPE): {BPE:.2f} °C\nTemperature inside the effect (T1): {T1:.2f} K")
     return BPE, T1
-def energy_balance(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float):
+def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:float,V: float,L: float):
+
     """
 
     Calculates the energy balance in an evaporator.
@@ -67,8 +68,8 @@ def energy_balance(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: fl
     based on the flow concentrations, temperatures, and pressures involved in the evaporation process.
 
     Args:
-        xf (float): Concentration of the flow (% w/w).
-        Tf (float): Feed temperature
+        hf (float): Enthaply of feed (kJ/kmol).
+        hL (float): Enthaply of feed (kJ/kmol).
         P1 (float): Pressure inside the effect (Pa)
         T1 (float): Temperature inside the effect (Pa)
         Ps (float): Steam pressure (Pa)
@@ -87,8 +88,8 @@ def energy_balance(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: fl
     
     #Enthalpies of the process
     Hv=PropsSI('H', 'P', P1, 'Q', 1, 'Water') # Produced vapor at P1,T1 without solute
-    hf=PropsSI('H', 'T', Tf, 'P', 101325, 'Water')
-    hL=PropsSI('H', 'T', T1, 'P', P1, 'Water')#Liquor entalphy at T1,xL
+    hf=hf / ((((xf / 58.44) * 58.44) + (((100 - xf) / 18.015) * 18.015)) / ((xf / 58.44) + ((100 - xf) / 18.015)))
+    hL=hL / ((((xL / 58.44) * 58.44) + (((100 - xL) / 18.015) * 18.015)) / ((xL / 58.44) + ((100 - xL) / 18.015)))
     # Steam mass flow calculation
     S = (L * hL + V * Hv - F * hf) / l_heat
     print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
