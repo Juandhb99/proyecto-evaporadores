@@ -88,9 +88,10 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     
     #Enthalpies of the process
     Hv=PropsSI('H', 'P', P1, 'Q', 1, 'Water') # Produced vapor at P1,T1 without solute
-    hf=hf / ((((xf / 58.44) * 58.44) + (((100 - xf) / 18.015) * 18.015)) / ((xf / 58.44) + ((100 - xf) / 18.015)))
-    hL=hL / ((((xL / 58.44) * 58.44) + (((100 - xL) / 18.015) * 18.015)) / ((xL / 58.44) + ((100 - xL) / 18.015)))
+    #Convert from kJ/kmol to J/kg
+    hf=(hf / ((((xf / 58.44) * 58.44) + (((100 - xf) / 18.015) * 18.015)) / ((xf / 58.44) + ((100 - xf) / 18.015))))*1000
+    hL=(hL / ((((xL / 58.44) * 58.44) + (((100 - xL) / 18.015) * 18.015)) / ((xL / 58.44) + ((100 - xL) / 18.015))))*1000
     # Steam mass flow calculation
-    S = (L * hL + V * Hv - F * hf) / l_heat
+    S = ((L * hL) + (V * Hv) - (F * hf)) / l_heat
     print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
     return S, Ts
