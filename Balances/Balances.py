@@ -95,3 +95,46 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     S = ((L * hL) + (V * Hv) - (F * hf)) / l_heat
     print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
     return S, Ts
+#def energy_balance(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float,xL:float):
+    """
+
+    Calculates the energy balance in an evaporator.
+
+    This function computes the temperature of the steam vapor (Ts) and the mass flow of steam (S) 
+    based on the flow concentrations, temperatures, and pressures involved in the evaporation process.
+
+    Args:
+        xf (float): Concentration of the flow (% w/w).
+        Tf (float): Feed temperature
+        P1 (float): Pressure inside the effect (Pa)
+        T1 (float): Temperature inside the effect (Pa)
+        Ps (float): Steam pressure (Pa)
+        L (float): Liquor flow out of the evaporator (kg).
+        xL (float): Concentration of the output flow in % w/w. 
+        V (float): Vapor flow out of the evaporator (kg). 
+        F (float): Initial flow (kg).
+    Returns:
+        Ts (float): Temperature os the steam vapor (K).
+        S (float): steam mass flow (kg).
+    """
+    #STEAM PROPERTIES
+    Ts= PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  #Boiling point of pure water at Ps (K)
+    H_liq = PropsSI('H', 'P', Ps, 'Q', 0, 'Water')
+    H_vap = PropsSI('H', 'P', Ps, 'Q', 1, 'Water')
+    l_heat=H_vap - H_liq    #Latent heat of water vapor at Ps (J/kg)
+    
+    #Enthalpies of the process
+    Hv=PropsSI('H', 'P', P1, 'Q', 1, 'Water') # Produced vapor at P1,T1 without solute
+    hf=PropsSI('H', 'T', Tf, 'P', 101325, 'Water')
+    hL=PropsSI('H', 'T', T1, 'P', P1, 'Water')#Liquor entalphy at T1,xL
+    a1, a2, a3, a4, a5,a6,a7,a8,a9,a10 = (-2.348e4, 3.152e5, 2.803e6, -1.446e5, 7.826e03,-4.417e1,2.139e-1,-1.991e4,2.778e4,9.728e1)
+    sF=xf/100
+    sL=xL/100
+    tf=Tf-273.15
+    t1=T1-273.15
+    hf=hf-(sF*(a1+(a2*sF)+(a3*(sF**2))+(a4*(sF**3))+(a5*tf)+(a6*(tf**2))+(a7*(tf**3))+(a8*tf*sF)+(a9*tf*(sF**2))+(a10*sF*(tf**2))))
+    hL=hL-(sL*(a1+(a2*sL)+(a3*(sL**2))+(a4*(sL**3))+(a5*t1)+(a6*(t1**2))+(a7*(t1**3))+(a8*t1*sL)+(a9*t1*(sL**2))+(a10*sL*(t1**2))))
+    # Steam mass flow calculation
+    S = (L * hL + V * Hv - F * hf) / l_heat
+    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
+    return S, Ts
