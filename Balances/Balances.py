@@ -1,8 +1,6 @@
-import pandas as pd
 import tkinter as tk
 from tkinter import simpledialog
 from CoolProp.CoolProp import PropsSI
-import numpy as np
 def ask_for_inputs():
     root = tk.Tk()
     root.withdraw()
@@ -58,7 +56,7 @@ def Boling_Point_Elevation(xf:float,P1: float):
     T1= (Tw+BPE)+273.15 #Boiling point of the solution at P1 (K)
     print(f"Boiling Point Elevation (BPE): {BPE:.2f} °C\nTemperature inside the effect (T1): {T1:.2f} K")
     return BPE, T1
-def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:float,V: float,L: float):
+def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float):
 
     """
 
@@ -66,6 +64,9 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
 
     This function computes the temperature of the steam vapor (Ts) and the mass flow of steam (S) 
     based on the flow concentrations, temperatures, and pressures involved in the evaporation process.
+    
+    It also computes the overall heat transfer coefficient (U) based on the temperature of the steam (Ts)
+    and the temperature inside the effect (T1) 
 
     Args:
         hf (float): Enthaply of feed (kJ/kmol).
@@ -79,6 +80,7 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     Returns:
         Ts (float): Temperature os the steam vapor (K).
         S (float): steam mass flow (kg).
+        U (float): Overall heat transfer coefficient (J/K*cm^2).
     """
     #STEAM PROPERTIES
     Ts= PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  #Boiling point of pure water at Ps (K)
@@ -93,15 +95,37 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     hL=(hL / ((((xL / 58.44) * 58.44) + (((100 - xL) / 18.015) * 18.015)) / ((xL / 58.44) + ((100 - xL) / 18.015))))*1000
     # Steam mass flow calculation
     S = ((L * hL) + (V * Hv) - (F * hf)) / l_heat
-    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
-    return S, Ts
-#def energy_balance(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float,xL:float):
+
+    #                                           Overall heat transfer coefficient
+    # The area for evaporator one is defined
+    A=3054 #cm^2
+    U=(S*l_heat)/(A*(Ts-T1))    #J/K*cm^2
+    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
+
+    return S,Ts,U
+def COP(V: float,S: float):
+    """
+    Calculates the coefficient of performance (COP) of the evaporator 1 as single effect wiht the steam used (S) and
+    the vapor produced in the evaporator (V) 
+    Args:
+        S (float): steam mass flow (kg).
+        V (float): Vapor flow out of the evaporator (kg)
+    Returns:
+        COP (float): coefficient of performance. 
+    """
+    COP=V/S
+    print(f"The coefficient of performance (COP): {COP:.3f}")
+    return COP
+def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float,xL:float):
     """
 
     Calculates the energy balance in an evaporator.
 
     This function computes the temperature of the steam vapor (Ts) and the mass flow of steam (S) 
     based on the flow concentrations, temperatures, and pressures involved in the evaporation process.
+
+    It also computes the overall heat transfer coefficient (U) based on the temperature of the steam (Ts)
+    and the temperature inside the effect (T1) 
 
     Args:
         xf (float): Concentration of the flow (% w/w).
@@ -116,6 +140,7 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     Returns:
         Ts (float): Temperature os the steam vapor (K).
         S (float): steam mass flow (kg).
+        U (float): Overall heat transfer coefficient (J/K*cm^2).
     """
     #STEAM PROPERTIES
     Ts= PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  #Boiling point of pure water at Ps (K)
@@ -136,5 +161,10 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,Ps:float,F:flo
     hL=hL-(sL*(a1+(a2*sL)+(a3*(sL**2))+(a4*(sL**3))+(a5*t1)+(a6*(t1**2))+(a7*(t1**3))+(a8*t1*sL)+(a9*t1*(sL**2))+(a10*sL*(t1**2))))
     # Steam mass flow calculation
     S = (L * hL + V * Hv - F * hf) / l_heat
-    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K")
-    return S, Ts
+
+    #                                           Overall heat transfer coefficient
+    # The area for evaporator one is defined
+    A=3054 #cm^2
+    U=(S*l_heat)/(A*(Ts-T1))    #J/K*cm^2
+    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
+    return S, Ts,U
