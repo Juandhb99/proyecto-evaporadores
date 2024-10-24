@@ -90,5 +90,4 @@ elif simulation_type == "Transient state":
         st.error("Error: Please select a valid solution option to continue.")
 else:
     st.error("Error: Please select a valid simulation type to continue.")
-#http://192.168.0.14:8501/#input-data-for-evaporation-process-in-steady-state
-#streamlit run https://raw.githubusercontent.com/streamlit/demo-uber-nyc-pickups/master/streamlit_app.py
+#streamlit run app.py
