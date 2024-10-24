@@ -10,6 +10,7 @@ Tf=298.15
 P1=74000 #Atmospheric Pressure
 Ps=131000
 xL=11.2
+option="Water-Salt"
 #Calculate balances an elevation of the boiling point
 L,V=material_balance(F,xf,xL)
 BPE, T1=Boling_Point_Elevation(xf,P1)
@@ -24,7 +25,7 @@ BPE, T1=Boling_Point_Elevation(xf,P1)
 #hf=predictions_feed['LIQUID HMX kJ/kmol']
 #hL=predictions_liquor['LIQUID HMX kJ/kmol']
 #S,Ts,U=energy_balance(xf, xL, hf, hL, P1,T1, Ps, F, V, L)
-S,Ts,U=energy_balancem(xf,Tf,P1,T1,Ps,F,V,L,xL)
+S,Ts,U=energy_balancem(xf,Tf,P1,T1,Ps,F,V,L,xL,option)
 cop=COP(V,S)
 #print properties
 #for property, value in predictions_feed.items():
