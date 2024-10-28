@@ -164,12 +164,12 @@ elif st.session_state.current_window == 'Simulation':
                         cope = COP(Ve, Se)
                         BPEe = T1e - (PropsSI('T', 'P', P1, 'Q', 0, 'Water'))
                         results_dfc["Experimental Values"] = [Le, Ve, BPEe, T1e, Se, Tse, Ue, cope]
-                        results_dfc["Absolute Error (%)"] = abs(results_dfc["Experimental Values"] - results_dfc["Calculated Value"]) * 100
+                        results_dfc["Error (%)"] = abs((results_dfc["Experimental Values"] - results_dfc["Calculated Value"])/results_dfc["Calculated Value"]) * 100
 
                         # Format absolute error to 2 decimals
                         results_dfc["Experimental Values"] = results_dfc["Experimental Values"].map(lambda x: f"{x:.2f}")
                         results_dfc["Calculated Value"] = results_dfc["Calculated Value"].map(lambda x: f"{x:.2f}")
-                        results_dfc["Absolute Error (%)"] = results_dfc["Absolute Error (%)"].map(lambda x: f"{x:.2f}")
+                        results_dfc["Error (%)"] = results_dfc["Error (%)"].map(lambda x: f"{x:.2f}")
                         results_dfc=results_dfc.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
                         st.markdown("## **Calculated Values**")
                         st.write(results_dfc.to_html(), unsafe_allow_html=True)
