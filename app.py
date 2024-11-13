@@ -47,7 +47,8 @@ st.sidebar.button("Equipment Usage Recommendations", on_click=recommendations)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
-    st.title("Some general information about the evaporator system")
+    st.title("LIQ Evaporators")
+    st.image('eq.jpg', use_column_width=True)
     st.write("SOME INFO")
 elif st.session_state.current_window == 'Simulation':
 
@@ -72,17 +73,18 @@ elif st.session_state.current_window == 'Simulation':
         )
         
         if option == "Select an option":
-            st.error("Error: Please select a valid solution option to continue.")
+            st.error("Please select a valid solution option to continue.")
 
         st.header("Stationary state simulation")
         # Asking for values from the user as numbers
         st.subheader("Enter Initial Conditions")
         F = st.number_input("Enter the initial flow (kg):", min_value=0.0, format="%.2f")
         xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
+        xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
         Tf = st.number_input("Enter the feed temperature (K):", min_value=0.0, format="%.2f")
         P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
         Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
-        xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
+        
         
         if st.button("Submit"):
             # Validate inputs
@@ -145,16 +147,16 @@ elif st.session_state.current_window == 'Simulation':
                 if st.button("Submit experimental data"):
                     if Le <= 0 or Ve <= 0 or Se <= 0:
                         st.error("Error: The flow must be greater than 0 kg.")
-                    tolerance = 0.05 * F  # 5% of F
-                    if abs((Le + Ve) - F) > tolerance:
-                        st.warning("Warning: The sum of liquor flow (L) and vapor flow (V) differs from the initial flow (F) by more than 5%. Please check your balances.")
+
                     elif T1e <= 273.153:
                         st.error("Error: The feed temperature must be greater than 273.153 K.")
                     
                     else:
                         st.success("The experimental data has been successfully uploaded.")
                         results_dfc = st.session_state.results_df.rename(columns={"Value": "Calculated Value"})
-
+                        tolerance = 0.05 * F  # 5% of F
+                        if abs((Le + Ve) - F) > tolerance:
+                            st.warning("Warning: The sum of liquor flow (L) and vapor flow (V) differs from the initial flow (F) by more than 5%. Please check your balances.")
                         # Find the steam temperature at Ps
                         Tse = PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  # Boiling point of pure water at Ps (K)
                         H_liq = PropsSI('H', 'P', Ps, 'Q', 0, 'Water')
@@ -188,10 +190,10 @@ elif st.session_state.current_window == 'Simulation':
         "Choose the solution",
         ("Select an option", "Water-Water", "Water-Salt"),)
         if option == "Select an option":
-            st.error("Error: Please select a valid solution option to continue.")
+            st.error("Please select a valid solution option to continue.")
         st.subheader("Working on it...")
     else:
-        st.error("Error: Please select a valid simulation type to continue.")
+        st.error("Please select a valid simulation type to continue.")
 elif st.session_state.current_window == 'Equipment Usage Recommendations':
     st.title("General recomendations to use the Equipment")
     st.write("SOME INFO")
@@ -202,5 +204,5 @@ elif st.session_state.current_window == 'Equipment Usage Recommendations':
     - For the steam from the boiler, it is recommended to maintain line pressure between 0.3 and 0.4; the valves required to achieve this should be controlled by **one person only**.
     - **The steam line from the boiler should be the last to be activated and requires prior authorization from the instructor.**
     """)
-
+    st.image('feed.jpg', width=400)
 #streamlit run app.py
