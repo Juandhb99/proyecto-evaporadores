@@ -4,27 +4,18 @@ import pandas as pd
 from CoolProp.CoolProp import PropsSI
 from Balances.Balances import ask_for_inputs, material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
-#-----------------------------------------------------------
+#---------------------------------------------------------------------------------
+st.image("logo.png", width=200)
 
-#To make the color of the background black 
+def centered_image(image_path, width):
 
-st.markdown(
-     """
-     <style>
-     body {
-         background-color: black;
-         color: white; /* Para que el texto sea visible */
-     }
-     .stApp {
-         background-color: black;
-     }
-     </style>
-     """,
-     unsafe_allow_html=True
- )
-#-------------------------------------------------------------------------------------
-ruta = "logo.png"
-st.image(ruta, width=200)
+    col1, col2, col3 = st.columns([1, width / 100, 1])
+    with col1:
+        st.write("") 
+    with col2:
+        st.image(image_path, width=width)
+    with col3:
+        st.write("") 
 #----------------------------------------------------------------------------
 if 'current_window' not in st.session_state:
     st.session_state.current_window = 'General information'
@@ -38,17 +29,20 @@ def simulation_module():
 
 def recommendations():
     st.session_state.current_window = 'Equipment Usage Recommendations'
+def visuals():
+    st.session_state.current_window = 'Useful videos and pictures'
 
 #  Navigation menu options
 st.sidebar.title("Navigation Menu")
 st.sidebar.button("General information", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
 st.sidebar.button("Equipment Usage Recommendations", on_click=recommendations)
+st.sidebar.button("Useful videos and pictures", on_click=visuals)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
     st.title("LIQ Evaporators")
-    st.image('eq.jpg', use_column_width=True)
+    centered_image('eq.jpg',width=600)
     st.write("SOME INFO")
 elif st.session_state.current_window == 'Simulation':
 
@@ -204,5 +198,22 @@ elif st.session_state.current_window == 'Equipment Usage Recommendations':
     - For the steam from the boiler, it is recommended to maintain line pressure between 0.3 and 0.4; the valves required to achieve this should be controlled by **one person only**.
     - **The steam line from the boiler should be the last to be activated and requires prior authorization from the instructor.**
     """)
-    st.image('feed.jpg', width=400)
+    
+elif st.session_state.current_window == 'Useful videos and pictures':
+    st.header("Tanks")
+    st.subheader("Feed Tank")
+    centered_image('feed.jpg',width=400)
+    st.subheader("Condensed steam tank")
+    st.subheader("Condensed vapor tank")
+    st.header("PLC")
+    st.write("Show the display")
+    st.header("Pumps")
+    st.subheader("Pump (1)")
+    st.write("This pump is used to transport the solution from the feed tank to the evaporator 1")
+    st.subheader("Pump (2)")
+    st.write("This pump is used to transport the solution from the evaporator 1 to evaporator 2 or to a recolection tank")
+    st.subheader("Vacuum pump")
+    st.write('This pump uses water to create a vacuum')
+
+
 #streamlit run app.py
