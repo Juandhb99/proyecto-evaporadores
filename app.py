@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from CoolProp.CoolProp import PropsSI
-from Balances.Balances import ask_for_inputs, material_balance, Boling_Point_Elevation, energy_balancem, COP
+from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
 #---------------------------------------------------------------------------------
 st.image("logo.png", width=200)
@@ -72,38 +72,47 @@ elif st.session_state.current_window == 'Simulation':
         st.header("Stationary state simulation")
         # Asking for values from the user as numbers
         st.subheader("Enter Initial Conditions")
-        F = st.number_input("Enter the initial flow (kg):", min_value=0.0, format="%.2f")
-        xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
-        xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
+        F = st.number_input("Enter the initial mass (kg):", min_value=0.0, format="%.2f")
         Tf = st.number_input("Enter the feed temperature (K):", min_value=0.0, format="%.2f")
         P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
         Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
-        
+        if option=="Water-Water":
+            V = st.number_input("Enter the vapor mass to be collected (kg):", min_value=0.0, format="%.2f")
+        else:
+            xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
+            xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
+                
         
         if st.button("Submit"):
             # Validate inputs
             if F <= 0:
                 st.error("Error: The flow must be greater than 0 kg.")
-            elif xf < 0 or xf > 16:
-                st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
             elif Tf < 273.153:
                 st.error("Error: The feed temperature must be greater than 273.153 K.")
             elif P1 < 611.655 or P1 > 2.2064e+07:
                 st.error("Error: The pressure inside the effect must be greater than 611.655 Pa.")
             elif Ps < 611.655 or Ps > 2.2064e+07:
                 st.error("Error: The steam pressure must be greater than 611.655 Pa.")
-            elif xL < 0 or xL > 16:
-                st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
+            if option=="Water-Salt":
+                if xL < 0 or xL > 16:
+                    st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
+                elif xf < 0 or xf > 16:
+                    st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
             else:
                 st.success("The initial data has been successfully uploaded.")
 
                 # Apply the functions
-                L, V = material_balance(F, xf, xL)
-                BPE, T1 = Boling_Point_Elevation(xf, P1)
+                if option=="Water-Water":
+                    L = F-V
+                    BPE="NA"
+                    xf=0
+                    xL=0
+                    T1=PropsSI('T', 'P', P1, 'Q', 0, 'Water')+0.01 #Boiling point of pure water at P1 (°C)
+                else:
+                    L, V = material_balance(F, xf, xL)
+                    BPE, T1 = Boling_Point_Elevation(xf, P1)
                 S, Ts, U = energy_balancem(xf, Tf, P1, T1, Ps, F, V, L, xL, option)
                 cop = COP(V, S)
-                if option=="Water-Water":
-                    BPE="NA"
                 # Create a DataFrame to show the results
                 results = {
                     "Variable": [
@@ -173,6 +182,7 @@ elif st.session_state.current_window == 'Simulation':
             elif compare == "No":
                 st.markdown("## **Calculated Values**")
                 results_df_display = st.session_state.results_df.copy()
+                results_df_display["Value"] = pd.to_numeric(results_df_display["Value"], errors="coerce")
                 results_df_display["Value"] = results_df_display["Value"].map(lambda x: f"{x:.2f}")  # Use 3 decimals
                 results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
                 st.write(results_df_display.to_html(), unsafe_allow_html=True)
