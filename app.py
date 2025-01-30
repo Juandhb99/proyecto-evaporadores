@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-
 from CoolProp.CoolProp import PropsSI
 from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
@@ -29,8 +28,15 @@ def simulation_module():
 
 def recommendations():
     st.session_state.current_window = 'Equipment Usage Recommendations'
+
+def procedures():
+    st.session_state.current_window = 'Procedures'
+
 def visuals():
     st.session_state.current_window = 'Useful videos and pictures'
+
+def Repository():
+    st.session_state.current_window = 'Repository'
 
 #  Navigation menu options
 st.sidebar.title("Navigation Menu")
@@ -38,6 +44,8 @@ st.sidebar.button("General information", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
 st.sidebar.button("Equipment Usage Recommendations", on_click=recommendations)
 st.sidebar.button("Useful videos and pictures", on_click=visuals)
+st.sidebar.button("Procedures", on_click=procedures)
+st.sidebar.button("Repository", on_click=Repository)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
@@ -211,19 +219,44 @@ elif st.session_state.current_window == 'Equipment Usage Recommendations':
     
 elif st.session_state.current_window == 'Useful videos and pictures':
     st.header("Tanks")
+    # Feed Tank
     st.subheader("Feed Tank")
-    centered_image('feed.jpg',width=400)
-    st.subheader("Condensed steam tank")
-    st.subheader("Condensed vapor tank")
-    st.header("PLC")
-    st.write("Show the display")
-    st.header("Pumps")
-    st.subheader("Pump (1)")
-    st.write("This pump is used to transport the solution from the feed tank to the evaporator 1")
-    st.subheader("Pump (2)")
-    st.write("This pump is used to transport the solution from the evaporator 1 to evaporator 2 or to a recolection tank")
-    st.subheader("Vacuum pump")
-    st.write('This pump uses water to create a vacuum')
+    centered_image("Repositorio/proyecto-evaporadores/Images_Evaporador/feed.jpg", 400)
+    # Condensed Steam Tank
+    st.subheader("Condensed Steam Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor.jpeg", 400)
+    st.subheader("Condensed Steam Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor2.jpeg", 400)
 
+    # Condensed Vapor Tank
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\LlaveDanada.jpeg", 400)
 
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\ReferenciasMarcadas.jpeg", 400)
+
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\SolucionAgua.png", 400)
+
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\NuevasBalanzas.jpeg", 400)
+
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaCorta.jpeg", 400)
+
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaPeligrosa.jpeg", 400)
+
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Manometro.jpeg", 400)
+
+elif st.session_state.current_window == 'Procedures':
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 400)
+
+elif st.session_state.current_window == 'Repository':
+    st.subheader("Condensed Vapor Tank")
+    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 400)
 #streamlit run app.py
+
+#Images_Evaporador
