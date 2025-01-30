@@ -3,6 +3,8 @@ import pandas as pd
 from CoolProp.CoolProp import PropsSI
 from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
+from pdf2image import convert_from_path
+
 #---------------------------------------------------------------------------------
 st.image("logo.png", width=200)
 
@@ -36,7 +38,10 @@ def visuals():
     st.session_state.current_window = 'Useful videos and pictures'
 
 def Repository():
-    st.session_state.current_window = 'Repository'
+    st.session_state.current_window = 'Repository/Reports'
+
+def Dashboard():
+    st.session_state.current_window = 'Dashboard'
 
 #  Navigation menu options
 st.sidebar.title("Navigation Menu")
@@ -45,7 +50,8 @@ st.sidebar.button("Simulation", on_click=simulation_module)
 st.sidebar.button("Equipment Usage Recommendations", on_click=recommendations)
 st.sidebar.button("Useful videos and pictures", on_click=visuals)
 st.sidebar.button("Procedures", on_click=procedures)
-st.sidebar.button("Repository", on_click=Repository)
+st.sidebar.button("Repository/Reports", on_click=Repository)
+st.sidebar.button("Dashboard", on_click=Dashboard)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
@@ -206,6 +212,7 @@ elif st.session_state.current_window == 'Simulation':
         st.subheader("Working on it...")
     else:
         st.error("Please select a valid simulation type to continue.")
+
 elif st.session_state.current_window == 'Equipment Usage Recommendations':
     st.title("General recomendations to use the Equipment")
     st.write("SOME INFO")
@@ -216,47 +223,87 @@ elif st.session_state.current_window == 'Equipment Usage Recommendations':
     - For the steam from the boiler, it is recommended to maintain line pressure between 0.3 and 0.4; the valves required to achieve this should be controlled by **one person only**.
     - **The steam line from the boiler should be the last to be activated and requires prior authorization from the instructor.**
     """)
+    st.title("Changes made")
+    st.markdown("""A steam flow control loop regulates the amount of steam in a pipe through an adjustable valve. It includes 
+    sensors and a controller that monitor the flow. The control strategy would be feedback control, where the measurement is taken at the pressure at the inlet of the effect, 
+    and the final action is performed on an automatic flow valve that restricts the steam entering the equipment. Thus, this control loop is classified as a system where the controlled variable 
+    is the pressure at the inlet of the effect, and the objective is to maintain it within a desired range to ensure efficient and safe operation of the equipment. The controller compares the actual pressure measurement
+     with the reference value or setpoint, generating a correction signal that adjusts the opening of the automatic valve to regulate the steam flow. This allows for compensation of external disturbances or changes in operating
+     conditions, ensuring stable and optimal process performance.""")
     
 elif st.session_state.current_window == 'Useful videos and pictures':
+    st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
+    These images provide visual support to better understand the operation of the equipment, identify potential failures, and 
+    reinforce usage recommendations. Through these visual representations, the goal is to simplify the technical interpretation 
+    of key aspects of the system, from tank feed to critical equipment connections.""" )
+
     st.header("Tanks")
     # Feed Tank
     st.subheader("Feed Tank")
-    centered_image("Repositorio/proyecto-evaporadores/Images_Evaporador/feed.jpg", 400)
+    centered_image(r"Repositorio/proyecto-evaporadores/Images_Evaporador/feed.jpg", 400)
     # Condensed Steam Tank
     st.subheader("Condensed Steam Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor.jpeg", 400)
     st.subheader("Condensed Steam Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor2.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\EntradaVapor2.jpeg", 400)
 
     # Condensed Vapor Tank
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\LlaveDanada.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\LlaveDanada.jpeg", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\ReferenciasMarcadas.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\ReferenciasMarcadas.jpeg", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\SolucionAgua.png", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\SolucionAgua.png", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\NuevasBalanzas.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\NuevasBalanzas.jpeg", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaCorta.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaCorta.jpeg", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaPeligrosa.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\TuberiaPeligrosa.jpeg", 400)
 
     st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Manometro.jpeg", 400)
+    centered_image(r"Repositorio\proyecto-evaporadores\Images_Evaporador\Manometro.jpeg", 400)
 
 elif st.session_state.current_window == 'Procedures':
     st.subheader("Condensed Vapor Tank")
     centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 400)
 
-elif st.session_state.current_window == 'Repository':
-    st.subheader("Condensed Vapor Tank")
-    centered_image("Repositorio\proyecto-evaporadores\Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 400)
+elif st.session_state.current_window == 'Repository/Reports':
+    st.title("Visualizar PDF como imágenes")
+    pdf_path = r"C:\Users\marti\OneDrive - Universidad Nacional de Colombia\Documentos\Repositorio\proyecto-evaporadores\Images_Evaporador\Evaporador - planos.pdf"
+    try:
+        pages = convert_from_path(pdf_path, 300)  # 300 DPI
+        for page in pages:
+            st.image(page, use_column_width=True)
+    except Exception as e:
+        st.error(f"No se pudo procesar el PDF: {e}")
+
+elif st.session_state.current_window == 'Dashboard':
+    st.title("Real-Time Dashboard")
+    st.write("This dashboard monitors key system parameters in real-time.")
+
+    # Simulación de datos en tiempo real
+    import numpy as np
+    import time
+
+    data = pd.DataFrame(columns=["Time", "Pressure (Pa)", "Temperature (K)"])
+    for i in range(10):  # Simula 10 iteraciones
+        new_row = {
+            "Time": i,
+            "Pressure (Pa)": np.random.uniform(1e5, 2e5),  # Presión aleatoria
+            "Temperature (K)": np.random.uniform(273, 373),  # Temperatura aleatoria
+        }
+        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
+        st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
+        time.sleep(1)
+
+
+
 #streamlit run app.py
 
 #Images_Evaporador
