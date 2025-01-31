@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import simpledialog
 from CoolProp.CoolProp import PropsSI
 def material_balance(F:float,xf:float,xL:float):
     """
@@ -18,8 +16,6 @@ def material_balance(F:float,xf:float,xL:float):
     """
     L=F*xf/xL
     V=F-L
-    #print(f"Feed flow (F): {F} kg\nFeed concentration (xf): {xf} % w/w\nLiquor concentration (xL): {xL} % w/w")
-    #print(f"Liquor flow (L): {L:.2f} kg\nVapor flow (V): {V:.2f} kg")
     return L,V
 def Boling_Point_Elevation(xf:float,P1: float):
     """

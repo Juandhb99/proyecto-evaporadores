@@ -68,124 +68,129 @@ elif st.session_state.current_window == 'Simulation':
         
         if option == "Select an option":
             st.error("Please select a valid solution option to continue.")
-
-        st.header("Stationary state simulation")
-        # Asking for values from the user as numbers
-        st.subheader("Enter Initial Conditions")
-        F = st.number_input("Enter the initial mass (kg):", min_value=0.0, format="%.2f")
-        Tf = st.number_input("Enter the feed temperature (K):", min_value=0.0, format="%.2f")
-        P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
-        Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
-        if option=="Water-Water":
-            V = st.number_input("Enter the vapor mass to be collected (kg):", min_value=0.0, format="%.2f")
         else:
-            xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
-            xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
-                
-        
-        if st.button("Submit"):
-            # Validate inputs
-            if F <= 0:
-                st.error("Error: The flow must be greater than 0 kg.")
-            elif Tf < 273.153:
-                st.error("Error: The feed temperature must be greater than 273.153 K.")
-            elif P1 < 611.655 or P1 > 2.2064e+07:
-                st.error("Error: The pressure inside the effect must be greater than 611.655 Pa.")
-            elif Ps < 611.655 or Ps > 2.2064e+07:
-                st.error("Error: The steam pressure must be greater than 611.655 Pa.")
-            if option=="Water-Salt":
-                if xL < 0 or xL > 16:
-                    st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
-                elif xf < 0 or xf > 16:
-                    st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
+            st.header("Stationary state simulation")
+            # Asking for values from the user as numbers
+            st.subheader("Enter Initial Conditions")
+            F = st.number_input("Enter the initial mass (kg):", min_value=0.0, format="%.2f")
+            Tf = st.number_input("Enter the feed temperature (K):", min_value=0.0, format="%.2f")
+            P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
+            Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
+            if option=="Water-Water":
+                V = st.number_input("Enter the vapor mass to be collected (kg):", min_value=0.0, format="%.2f")
             else:
+                xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
+                xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
+                    
+            
+            if st.button("Submit"):
+                # Validate inputs
+                if F <= 0:
+                    st.error("Error: The flow must be greater than 0 kg.")
+                elif Tf < 273.153:
+                    st.error("Error: The feed temperature must be greater than 273.153 K.")
+                elif P1 < 611.655 or P1 > 2.2064e+07:
+                    st.error("Error: The pressure inside the effect must be greater than 611.655 Pa.")
+                elif Ps < 611.655 or Ps > 2.2064e+07:
+                    st.error("Error: The steam pressure must be greater than 611.655 Pa.")
+                if option=="Water-Salt":
+                    if xL < 0 or xL > 16:
+                        st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
+                    elif xf < 0 or xf > 16:
+                        st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
+
                 st.success("The initial data has been successfully uploaded.")
 
-                # Apply the functions
+                    # Apply the functions
+                    
                 if option=="Water-Water":
-                    L = F-V
-                    BPE="NA"
-                    xf=0
-                    xL=0
-                    T1=PropsSI('T', 'P', P1, 'Q', 0, 'Water')+0.01 #Boiling point of pure water at P1 (°C)
+                        L = F-V
+                        BPE="N/A"
+                        xf=0
+                        xL=0
+                        T1=PropsSI('T', 'P', P1, 'Q', 0, 'Water')+0.01 #Boiling point of pure water at P1 (°C)
                 else:
-                    L, V = material_balance(F, xf, xL)
-                    BPE, T1 = Boling_Point_Elevation(xf, P1)
+                        L, V = material_balance(F, xf, xL)
+                        BPE, T1 = Boling_Point_Elevation(xf, P1)
+                        
                 S, Ts, U = energy_balancem(xf, Tf, P1, T1, Ps, F, V, L, xL, option)
                 cop = COP(V, S)
-                # Create a DataFrame to show the results
+                    # Create a DataFrame to show the results
                 results = {
-                    "Variable": [
-                        "Liquor Flow (L)",
-                        "Vapor Flow (V)",
-                        "Boiling Point Elevation (BPE)",
-                        "Temperature inside the effect (T1)",
-                        "Steam Mass Flow (S)",
-                        "Temperature of the Steam (Ts)",
-                        "Overall Heat Transfer Coefficient (U)",
-                        "Coefficient of Performance (COP)"
-                    ],
-                    "Unit": ["kg", "kg", "°C", "K", "kg", "K", "J/K*cm²", "NA"],
-                    "Value": [L, V, BPE, T1, S, Ts, U, cop]
-                }
-                #Save the data to use later
-                st.session_state.results_df = pd.DataFrame(results) 
-
-        # Compare section only shows after submit
-        if st.session_state.results_df is not None:
-            st.subheader("Experimental data")
-            compare = st.radio(
-                "Do you want to compare your experimental data?",
-                ( "Yes", "No"),
-            )
-
-            if compare == "Yes":
-                st.subheader("Please ensure that the experimental data are collected under the same conditions as specified above.")
-                Le = st.number_input("Enter the amount of liquor collected (kg):", min_value=0.0, format="%.2f")
-                Ve = st.number_input("Enter the amount of vapor collected (kg):", min_value=0.0, format="%.2f")
-                Se = st.number_input("Enter the amount of steam collected (kg):", min_value=0.0, format="%.2f")
-                T1e = st.number_input("Enter the temperature inside the effect (K):", min_value=273.153, format="%.2f")
-                
-
-                if st.button("Submit experimental data"):
-                    if Le <= 0 or Ve <= 0 or Se <= 0:
-                        st.error("Error: The flow must be greater than 0 kg.")
-
-                    elif T1e <= 273.153:
-                        st.error("Error: The feed temperature must be greater than 273.153 K.")
+                        "Variable": [
+                            "Liquor Flow (L)",
+                            "Vapor Flow (V)",
+                            "Boiling Point Elevation (BPE)",
+                            "Temperature inside the effect (T1)",
+                            "Steam Mass Flow (S)",
+                            "Temperature of the Steam (Ts)",
+                            "Overall Heat Transfer Coefficient (U)",
+                            "Coefficient of Performance (COP)"
+                        ],
+                        "Unit": ["kg", "kg", "°C", "K", "kg", "K", "J/K*cm²", "N/A"],
+                        "Value": [L, V, BPE, T1, S, Ts, U, cop]
+                    }
+                    #Save the data to use later
+                st.session_state.results_df = pd.DataFrame(results)
                     
-                    else:
-                        st.success("The experimental data has been successfully uploaded.")
-                        results_dfc = st.session_state.results_df.rename(columns={"Value": "Calculated Value"})
-                        tolerance = 0.05 * F  # 5% of F
-                        if abs((Le + Ve) - F) > tolerance:
-                            st.warning("Warning: The sum of liquor flow (L) and vapor flow (V) differs from the initial flow (F) by more than 5%. Please check your balances.")
-                        # Find the steam temperature at Ps
-                        Tse = PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  # Boiling point of pure water at Ps (K)
-                        H_liq = PropsSI('H', 'P', Ps, 'Q', 0, 'Water')
-                        H_vap = PropsSI('H', 'P', Ps, 'Q', 1, 'Water')
-                        l_heat = H_vap - H_liq 
-                        Ue = (Se * l_heat) / (3054 * (Tse - T1e))
-                        cope = COP(Ve, Se)
-                        BPEe = T1e - (PropsSI('T', 'P', P1, 'Q', 0, 'Water'))
-                        results_dfc["Experimental Values"] = [Le, Ve, BPEe, T1e, Se, Tse, Ue, cope]
-                        results_dfc["Error (%)"] = abs((results_dfc["Experimental Values"] - results_dfc["Calculated Value"])/results_dfc["Calculated Value"]) * 100
 
-                        # Format absolute error to 2 decimals
-                        results_dfc["Experimental Values"] = results_dfc["Experimental Values"].map(lambda x: f"{x:.2f}")
-                        results_dfc["Calculated Value"] = results_dfc["Calculated Value"].map(lambda x: f"{x:.2f}")
-                        results_dfc["Error (%)"] = results_dfc["Error (%)"].map(lambda x: f"{x:.2f}")
-                        results_dfc=results_dfc.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
-                        st.markdown("## **Calculated Values**")
-                        st.write(results_dfc.to_html(), unsafe_allow_html=True)
+            # Compare section only shows after submit
+            if st.session_state.results_df is not None:
+                st.subheader("Experimental data")
+                compare = st.radio(
+                    "Do you want to compare your experimental data?",
+                    ( "Yes", "No"),
+                )
 
-            elif compare == "No":
-                st.markdown("## **Calculated Values**")
-                results_df_display = st.session_state.results_df.copy()
-                results_df_display["Value"] = pd.to_numeric(results_df_display["Value"], errors="coerce")
-                results_df_display["Value"] = results_df_display["Value"].map(lambda x: f"{x:.2f}")  # Use 3 decimals
-                results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
-                st.write(results_df_display.to_html(), unsafe_allow_html=True)
+                if compare == "Yes":
+                    st.subheader("Please ensure that the experimental data are collected under the same conditions as specified above.")
+                    Le = st.number_input("Enter the amount of liquor collected (kg):", min_value=0.0, format="%.2f")
+                    Ve = st.number_input("Enter the amount of vapor collected (kg):", min_value=0.0, format="%.2f")
+                    Se = st.number_input("Enter the amount of steam collected (kg):", min_value=0.0, format="%.2f")
+                    T1e = st.number_input("Enter the temperature inside the effect (K):", min_value=273.153, format="%.2f")
+                    
+
+                    if st.button("Submit experimental data"):
+                        if Le <= 0 or Ve <= 0 or Se <= 0:
+                            st.error("Error: The flow must be greater than 0 kg.")
+
+                        elif T1e <= 273.153:
+                            st.error("Error: The feed temperature must be greater than 273.153 K.")
+                        
+                        else:
+                            st.success("The experimental data has been successfully uploaded.")
+                            results_dfc = st.session_state.results_df.rename(columns={"Value": "Calculated Value"})
+                            tolerance = 0.05 * F  # 5% of F
+                            if abs((Le + Ve) - F) > tolerance:
+                                st.warning("Warning: The sum of liquor flow (L) and vapor flow (V) differs from the initial flow (F) by more than 5%. Please check your balances.")
+                            # Find the steam temperature at Ps
+                            Tse = PropsSI('T', 'P', Ps, 'Q', 0, 'Water')  # Boiling point of pure water at Ps (K)
+                            H_liq = PropsSI('H', 'P', Ps, 'Q', 0, 'Water')
+                            H_vap = PropsSI('H', 'P', Ps, 'Q', 1, 'Water')
+                            l_heat = H_vap - H_liq 
+                            Ue = (Se * l_heat) / (3054 * (Tse - T1e))
+                            cope = COP(Ve, Se)
+                            BPEe = T1e - (PropsSI('T', 'P', P1, 'Q', 0, 'Water'))
+                            results_dfc["Experimental Values"] = [Le, Ve, BPEe, T1e, Se, Tse, Ue, cope] 
+                            if option == "Water-Water":
+                                results_dfc = results_dfc[results_dfc["Variable"] != "Boiling Point Elevation (BPE)"]                       
+                            results_dfc["Error (%)"] = abs((results_dfc["Experimental Values"] - results_dfc["Calculated Value"])/results_dfc["Calculated Value"]) * 100
+
+                            # Format absolute error to 2 decimals
+                            results_dfc["Experimental Values"] = results_dfc["Experimental Values"].map(lambda x: f"{x:.2f}")
+                            results_dfc["Calculated Value"] = results_dfc["Calculated Value"].map(lambda x: f"{x:.2f}")
+                            results_dfc["Error (%)"] = results_dfc["Error (%)"].map(lambda x: f"{x:.1f}")
+                            results_dfc=results_dfc.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
+                            st.markdown("## **Calculated Values**")
+                            st.write(results_dfc.to_html(), unsafe_allow_html=True)
+
+                elif compare == "No":
+                    st.markdown("## **Calculated Values**")
+                    results_df_display = st.session_state.results_df.copy()
+                    results_df_display["Value"] = pd.to_numeric(results_df_display["Value"], errors="coerce")
+                    results_df_display["Value"] = results_df_display["Value"].map(lambda x: f"{x:.2f}")  # Use 3 decimals
+                    results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
+                    st.write(results_df_display.to_html(), unsafe_allow_html=True)
 
         
     elif simulation_type == "Transient state":
