@@ -1,4 +1,17 @@
+import tkinter as tk
+from tkinter import simpledialog
 from CoolProp.CoolProp import PropsSI
+def ask_for_inputs():
+    root = tk.Tk()
+    root.withdraw()
+    F = float(simpledialog.askstring("Input", "Enter the initial flow (kg):"))
+    xf = float(simpledialog.askstring("Input", "Enter the concentration of the feed flow (% w/w):"))
+    Tf = float(simpledialog.askstring("Input", "Enter the feed temperature (K):"))
+    P1 = float(simpledialog.askstring("Input", "Enter the pressure inside the effect (Pa):"))
+    Ps = float(simpledialog.askstring("Input", "Enter the steam pressure (Pa):"))
+    xL = float(simpledialog.askstring("Input", "Enter the concentration of the output flow (% w/w):"))
+
+    return xf, Tf, P1, Ps, F, xL
 def material_balance(F:float,xf:float,xL:float):
     """
     Calculates the material balance in an evaporator.
@@ -13,9 +26,11 @@ def material_balance(F:float,xf:float,xL:float):
     Returns:
         L (float): Liquor flow out of the evaporator in kg. 
         V (float): Vapor flow out of the evaporator in kg.
-    """
+    """    
     L=F*xf/xL
     V=F-L
+    print(f"Feed flow (F): {F} kg\nFeed concentration (xf): {xf} % w/w\nLiquor concentration (xL): {xL} % w/w")
+    print(f"Liquor flow (L): {L:.2f} kg\nVapor flow (V): {V:.2f} kg")
     return L,V
 def Boling_Point_Elevation(xf:float,P1: float):
     """
@@ -39,7 +54,7 @@ def Boling_Point_Elevation(xf:float,P1: float):
     C=1.522E-4-(3E-6*Tw)-(3E-8*(Tw**2))
     BPE=A*xf+(B*(xf**2))+(C*(xf**3))
     T1= (Tw+BPE)+273.15 #Boiling point of the solution at P1 (K)
-    #print(f"Boiling Point Elevation (BPE): {BPE:.2f} °C\nTemperature inside the effect (T1): {T1:.2f} K")
+    print(f"Boiling Point Elevation (BPE): {BPE:.2f} °C\nTemperature inside the effect (T1): {T1:.2f} K")
     return BPE, T1
 def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float):
 
@@ -85,7 +100,7 @@ def energy_balance(xf:float,xL:float,hf:float,hL: float,P1: float,T1: float,Ps:f
     # The area for evaporator one is defined
     A=3054 #cm^2
     U=(S*l_heat)/(A*(Ts-T1))    #J/K*cm^2
-    #print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
+    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
 
     return S,Ts,U
 def COP(V: float,S: float):
@@ -99,9 +114,9 @@ def COP(V: float,S: float):
         COP (float): coefficient of performance. 
     """
     COP=V/S
-    #print(f"The coefficient of performance (COP): {COP:.3f}")
+    print(f"The coefficient of performance (COP): {COP:.3f}")
     return COP
-def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float,xL:float,option):
+def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: float,L: float,xL:float):
     """
 
     Calculates the energy balance in an evaporator.
@@ -116,13 +131,12 @@ def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: f
         xf (float): Concentration of the flow (% w/w).
         Tf (float): Feed temperature
         P1 (float): Pressure inside the effect (Pa)
-        T1 (float): Temperature inside the effect 
+        T1 (float): Temperature inside the effect (Pa)
         Ps (float): Steam pressure (Pa)
         L (float): Liquor flow out of the evaporator (kg).
         xL (float): Concentration of the output flow in % w/w. 
         V (float): Vapor flow out of the evaporator (kg). 
         F (float): Initial flow (kg).
-        option (str): Type of solution worked.
     Returns:
         Ts (float): Temperature os the steam vapor (K).
         S (float): steam mass flow (kg).
@@ -137,18 +151,14 @@ def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: f
     #Enthalpies of the process
     Hv=PropsSI('H', 'P', P1, 'Q', 1, 'Water') # Produced vapor at P1,T1 without solute
     hf=PropsSI('H', 'T', Tf, 'P', 101325, 'Water')
-    hL=PropsSI('H', 'T', T1, 'P', P1, 'Water')#Liquor entalphy at T1
-    if option=="Water-Salt":
-        a1, a2, a3, a4, a5,a6,a7,a8,a9,a10 = (-2.348e4, 3.152e5, 2.803e6, -1.446e5, 7.826e03,-4.417e1,2.139e-1,-1.991e4,2.778e4,9.728e1)
-        sF=xf/100
-        sL=xL/100
-        tf=Tf-273.15
-        t1=T1-273.15
-        hf=hf-(sF*(a1+(a2*sF)+(a3*(sF**2))+(a4*(sF**3))+(a5*tf)+(a6*(tf**2))+(a7*(tf**3))+(a8*tf*sF)+(a9*tf*(sF**2))+(a10*sF*(tf**2))))
-        hL=hL-(sL*(a1+(a2*sL)+(a3*(sL**2))+(a4*(sL**3))+(a5*t1)+(a6*(t1**2))+(a7*(t1**3))+(a8*t1*sL)+(a9*t1*(sL**2))+(a10*sL*(t1**2))))
-    else:
-        pass
-    
+    hL=PropsSI('H', 'T', T1, 'P', P1, 'Water')#Liquor entalphy at T1,xL
+    a1, a2, a3, a4, a5,a6,a7,a8,a9,a10 = (-2.348e4, 3.152e5, 2.803e6, -1.446e5, 7.826e03,-4.417e1,2.139e-1,-1.991e4,2.778e4,9.728e1)
+    sF=xf/100
+    sL=xL/100
+    tf=Tf-273.15
+    t1=T1-273.15
+    hf=hf-(sF*(a1+(a2*sF)+(a3*(sF**2))+(a4*(sF**3))+(a5*tf)+(a6*(tf**2))+(a7*(tf**3))+(a8*tf*sF)+(a9*tf*(sF**2))+(a10*sF*(tf**2))))
+    hL=hL-(sL*(a1+(a2*sL)+(a3*(sL**2))+(a4*(sL**3))+(a5*t1)+(a6*(t1**2))+(a7*(t1**3))+(a8*t1*sL)+(a9*t1*(sL**2))+(a10*sL*(t1**2))))
     # Steam mass flow calculation
     S = (L * hL + V * Hv - F * hf) / l_heat
 
@@ -156,5 +166,5 @@ def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: f
     # The area for evaporator one is defined
     A=3054 #cm^2
     U=(S*l_heat)/(A*(Ts-T1))    #J/K*cm^2
-    #print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
+    print(f"Steam mass flow (S): {S:.2f} kg\nTemperature of the steam (Ts): {Ts:.2f} K\nThe overall heat transfer coefficient (U): {U:.2f} J/K*cm^2")
     return S, Ts,U
