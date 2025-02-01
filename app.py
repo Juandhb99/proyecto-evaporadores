@@ -95,12 +95,12 @@ st.sidebar.button("Alerts",on_click=Alerts)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
-    st.title("Chemical engineering Lab - Multieffect Evaporator Digital Twin")
+    st.title("Chemical Engineering Lab - Multieffect Evaporator Digital Twin")
     centered_image('eq.jpg',width=600)
 
     st.write("""El banco de evaporadores en los laboratorios de ingeniería química ha sido seleccionado como la 
              piedra angular para inaugurar la era de los modelos digitales en la facultad. Este equipo desempeña un 
-             papel fundamental en los experimentos relacionados con la concentración de soluciones, especialmente salmueras, }
+             papel fundamental en los experimentos relacionados con la concentración de soluciones, especialmente salmueras,
              debido a su capacidad para simular procesos industriales a escala de laboratorio.""")
     
     st.write("""The evaporator bank in the chemical engineering laboratories has been chosen as the cornerstone 
@@ -407,55 +407,60 @@ elif st.session_state.current_window == 'Dashboard':
 elif st.session_state.current_window == 'Alerts':
     st.title("🔴 Control de Seguridad del Evaporador")
 
-# *Rangos de Seguridad*
-TEMP_MIN, TEMP_MAX = 373, 420  # Temperatura en Kelvin (ejemplo)
-PRESSURE_MIN, PRESSURE_MAX = 50000, 200000  # Presión en Pascales (ejemplo)
-FLOW_MIN, FLOW_MAX = 1, 10  # Flujo de vapor en kg/s (ejemplo)
+    # *Rangos de Seguridad*
+    TEMP_MIN, TEMP_MAX = 15, 100  # Temperatura en °C (ejemplo)
+    VPRESSURE_MIN, VPRESSURE_MAX = -0.4, 0  # Presión manometrica de vacio bar (ejemplo)
+    PRESSURE_MIN, PRESSURE_MAX = 39000, 77000  # Presión en Pascales (ejemplo)
+    SPRESSURE_MIN, SPRESSURE_MAX = 5, 20  # Presión en psig (ejemplo)
 
-# *Inputs de usuario*
-st.sidebar.header("Parámetros de Operación")
-temperature = st.sidebar.number_input("🌡️ Temperatura (K)", min_value=300, max_value=500, value=380)
-pressure = st.sidebar.number_input("💨 Presión (Pa)", min_value=30000, max_value=250000, value=100000)
-flow_rate = st.sidebar.number_input("🔄 Flujo de Vapor (kg/s)", min_value=0.1, max_value=15.0, value=5.0)
+    # *Inputs de usuario*
+    st.sidebar.header("Parámetros de Operación")
+    temperature = st.sidebar.number_input("🌡️ Temperatura en el efecto (°C)")
+    pressure = st.sidebar.number_input("💨 Presión en el efecto (Pa)")
+    S_presure = st.sidebar.number_input("♨️ Presión del vapor de la caldera (psig)")
+    V_presure = st.sidebar.number_input("💨 Presión manométrica de vacío (bar)",max_value=0.0)
 
-# *Registro de Alertas*
-alerts = []
+    # *Registro de Alertas*
+    alerts = []
 
-# *Verificación de Seguridad*
-st.subheader("📊 Estado del Sistema")
+    # *Verificación de Seguridad*
+    st.subheader("📊 Estado del Sistema")
 
-if temperature < TEMP_MIN:
-    alerts.append(f"⚠️ *Temperatura muy baja*: {temperature} K (mínimo permitido {TEMP_MIN} K)")
-elif temperature > TEMP_MAX:
-    alerts.append(f"🚨 *Temperatura demasiado alta*: {temperature} K (máximo permitido {TEMP_MAX} K)")
+    if temperature < TEMP_MIN:
+        alerts.append(f"⚠️ *Temperatura muy baja*: {temperature} °C (mínimo permitido {TEMP_MIN} °C)")
+    elif temperature > TEMP_MAX:
+        alerts.append(f"🚨 *Temperatura demasiado alta*: {temperature} °C (máximo permitido {TEMP_MAX} °C)")
 
-if pressure < PRESSURE_MIN:
-    alerts.append(f"⚠️ *Presión demasiado baja*: {pressure} Pa (mínimo permitido {PRESSURE_MIN} Pa)")
-elif pressure > PRESSURE_MAX:
-    alerts.append(f"🚨 *Presión excesiva*: {pressure} Pa (máximo permitido {PRESSURE_MAX} Pa)")
+    if pressure < PRESSURE_MIN:
+        alerts.append(f"⚠️ *Presión demasiado baja*: {pressure} Pa (mínimo permitido {PRESSURE_MIN} Pa)")
+    elif pressure > PRESSURE_MAX:
+        alerts.append(f"🚨 *Presión excesiva*: {pressure} Pa (máximo permitido {PRESSURE_MAX} Pa)")
 
-if flow_rate < FLOW_MIN:
-    alerts.append(f"⚠️ *Flujo de vapor muy bajo*: {flow_rate} kg/s (mínimo permitido {FLOW_MIN} kg/s)")
-elif flow_rate > FLOW_MAX:
-    alerts.append(f"🚨 *Flujo de vapor muy alto*: {flow_rate} kg/s (máximo permitido {FLOW_MAX} kg/s)")
+    if S_presure < SPRESSURE_MIN:
+        alerts.append(f"⚠️ *Presión del vapor muy baja*: {S_presure} psig (mínimo permitido {SPRESSURE_MIN} psig)")
+    elif S_presure > SPRESSURE_MAX:
+        alerts.append(f"🚨 *Presión del vapor muy alta*: {S_presure} psig (máximo permitido {SPRESSURE_MAX} psig)")
+    if V_presure < VPRESSURE_MIN:
+        alerts.append(f"⚠️ *Presión del vapor muy baja*: {V_presure} psig (mínimo permitido {VPRESSURE_MIN} psig)")
+    elif V_presure > VPRESSURE_MAX:
+        alerts.append(f"🚨 *Presión del vapor muy alta*: {V_presure} psig (máximo permitido {VPRESSURE_MAX} psig)")
 
-# *Mostrar Alertas*
-if alerts:
-    st.warning("⚠️ *ALERTA*: Se han detectado condiciones fuera de los límites seguros.")
-    for alert in alerts:
-        st.markdown(alert)
-else:
-    st.success("✅ *Sistema en condiciones seguras*.")
+    # *Mostrar Alertas*
+    if alerts:
+        st.warning("⚠️ *ALERTA*: Se han detectado condiciones fuera de los límites seguros.")
+        for alert in alerts:
+            st.markdown(alert)
+    else:
+        st.success("✅ *Sistema en condiciones óptimas para operar*.")
 
-# *Historial de Alertas*
-st.subheader("📋 Registro de Eventos de Seguridad")
-df_alerts = pd.DataFrame(alerts, columns=["Mensaje de Alerta"])
+    # *Historial de Alertas*
+    st.subheader("📋 Registro de Eventos de Seguridad")
+    df_alerts = pd.DataFrame(alerts, columns=["Mensaje de Alerta"])
 
-if not df_alerts.empty:
-    st.write(df_alerts)
-else:
-    st.info("No se han registrado alertas hasta el momento.")
+    if not df_alerts.empty:
+        st.write(df_alerts)
+        
+    else:
+        st.info("No se han registrado alertas hasta el momento.")
 
 #streamlit run app.py
-
-#Images_Evaporador
