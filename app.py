@@ -1,31 +1,31 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from CoolProp.CoolProp import PropsSI
 from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
 from pdf2image import convert_from_path
+import fitz  # PyMuPDF
+from PIL import Image
+import time
 
 #---------------------------------------------------------------------------------
 st.markdown("""
     <style>
     /* Fondo principal de la interfaz */
     .css-1v3fvcr {
-        background-color: #524b7d; /* Blanco */
+        background-color: #3c3cb9; /* Blanco */
         color: black; /* Texto negro */
     }
 
-    /* Barra lateral */
-    [data-testid="stSidebar"] {
-        background-color: #524b7d !important; /* Rojo oscuro */
-        color: white; /* Texto blanco */
-    }
+   
 
     /* Botones de la barra lateral */
     [data-testid="stSidebar"] .stButton > button {
         background-color: #1C1C1C; /* Negro */
         color: white; /* Texto blanco */
         border-radius: 5px; /* Bordes redondeados */
-        border: 3px solid white; /* Borde blanco */
+        border: 1px solid white; /* Borde blanco */
         font-size: 16px; /* Tamaño del texto */
         margin: 10px 0; /* Espaciado entre botones */
     }
@@ -376,8 +376,7 @@ elif st.session_state.current_window == 'Procedures':
 
 elif st.session_state.current_window == 'Repository/Reports':
     st.title("Visualizar PDF como imágenes")
-    import fitz  # PyMuPDF
-    from PIL import Image
+    
 
     pdf_path = "Images_Evaporador/Evaporador - planos.pdf"
 
@@ -388,16 +387,12 @@ elif st.session_state.current_window == 'Repository/Reports':
         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
         st.image(img, use_column_width=True)
 
-
-
-
 elif st.session_state.current_window == 'Dashboard':
     st.title("Real-Time Dashboard")
     st.write("This dashboard monitors key system parameters in real-time.")
 
     # Simulación de datos en tiempo real
-    import numpy as np
-    import time
+    
 
     data = pd.DataFrame(columns=["Time", "Pressure (Pa)", "Temperature (K)"])
     for i in range(10):  # Simula 10 iteraciones
@@ -409,7 +404,57 @@ elif st.session_state.current_window == 'Dashboard':
         data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
         st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
         time.sleep(1)
+elif st.session_state.current_window == 'Alerts':
+    st.title("🔴 Control de Seguridad del Evaporador")
 
+# *Rangos de Seguridad*
+TEMP_MIN, TEMP_MAX = 373, 420  # Temperatura en Kelvin (ejemplo)
+PRESSURE_MIN, PRESSURE_MAX = 50000, 200000  # Presión en Pascales (ejemplo)
+FLOW_MIN, FLOW_MAX = 1, 10  # Flujo de vapor en kg/s (ejemplo)
+
+# *Inputs de usuario*
+st.sidebar.header("Parámetros de Operación")
+temperature = st.sidebar.number_input("🌡️ Temperatura (K)", min_value=300, max_value=500, value=380)
+pressure = st.sidebar.number_input("💨 Presión (Pa)", min_value=30000, max_value=250000, value=100000)
+flow_rate = st.sidebar.number_input("🔄 Flujo de Vapor (kg/s)", min_value=0.1, max_value=15.0, value=5.0)
+
+# *Registro de Alertas*
+alerts = []
+
+# *Verificación de Seguridad*
+st.subheader("📊 Estado del Sistema")
+
+if temperature < TEMP_MIN:
+    alerts.append(f"⚠️ *Temperatura muy baja*: {temperature} K (mínimo permitido {TEMP_MIN} K)")
+elif temperature > TEMP_MAX:
+    alerts.append(f"🚨 *Temperatura demasiado alta*: {temperature} K (máximo permitido {TEMP_MAX} K)")
+
+if pressure < PRESSURE_MIN:
+    alerts.append(f"⚠️ *Presión demasiado baja*: {pressure} Pa (mínimo permitido {PRESSURE_MIN} Pa)")
+elif pressure > PRESSURE_MAX:
+    alerts.append(f"🚨 *Presión excesiva*: {pressure} Pa (máximo permitido {PRESSURE_MAX} Pa)")
+
+if flow_rate < FLOW_MIN:
+    alerts.append(f"⚠️ *Flujo de vapor muy bajo*: {flow_rate} kg/s (mínimo permitido {FLOW_MIN} kg/s)")
+elif flow_rate > FLOW_MAX:
+    alerts.append(f"🚨 *Flujo de vapor muy alto*: {flow_rate} kg/s (máximo permitido {FLOW_MAX} kg/s)")
+
+# *Mostrar Alertas*
+if alerts:
+    st.warning("⚠️ *ALERTA*: Se han detectado condiciones fuera de los límites seguros.")
+    for alert in alerts:
+        st.markdown(alert)
+else:
+    st.success("✅ *Sistema en condiciones seguras*.")
+
+# *Historial de Alertas*
+st.subheader("📋 Registro de Eventos de Seguridad")
+df_alerts = pd.DataFrame(alerts, columns=["Mensaje de Alerta"])
+
+if not df_alerts.empty:
+    st.write(df_alerts)
+else:
+    st.info("No se han registrado alertas hasta el momento.")
 
 #streamlit run app.py
 
