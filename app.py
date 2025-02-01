@@ -299,7 +299,12 @@ elif st.session_state.current_window == 'Useful videos and pictures':
     centered_image(r"Images_Evaporador\Manometro.jpeg", 400)
 
 elif st.session_state.current_window == 'Procedures':
+    st.title("Procesos importantes")
     # Create columns to display the buttons
+    if "button_clicked" not in st.session_state:
+     st.session_state.button_clicked = None  # o cualquier valor predeterminado
+     
+     st.write("""En esta sección presione el botón de la información que desea consultar""")
     col1, col2, col3 = st.columns(3)
 
     # Buttons centered and in the same leves
@@ -330,7 +335,7 @@ elif st.session_state.current_window == 'Procedures':
 
     # Information depending on the button clicked
     if st.session_state.button_clicked == "Manual de operación":
-            st.title("Protocolo de encendido")
+            st.header("Protocolo de encendido")
 
             st.write("1. Antes de iniciar la práctica cercióese de que todos los tanques de recolección se encuentren vacíos, al igual que el cuerpo del evaporador.")
 
@@ -395,6 +400,7 @@ elif st.session_state.current_window == 'Procedures':
                         obtenidas del licor final para someterlas a una cromatografía, espectrofotometría e incluso a un difractómetro
                         para ver con precisión cuál es la concentración de la solución final. Adicional, en caso de trabajar con solución 
                         salina se propone la opción de realizar este análisis de la concentración haciendo uso de la conductividad.""")
+            #In the case they are using vaccum pressre___________________________________________________________________________
             st.subheader("Para ensayos a vacío")
             st.write("""
             A partir del **paso 11** de la sección de **_Protocolo de encendido_** se debe seguir el siguiente proceso:
@@ -414,7 +420,7 @@ elif st.session_state.current_window == 'Procedures':
             centered_image(r"Images_Evaporador\tanquevcon.png", width=400)
 
             st.write("4. A partir de este punto, continúe con el paso 12 de la sección de **_Protocolo de encendido_**.")
-
+            #----------------------------------------------
             st.subheader("Protocolo de operación")
             st.write("1. Mantener el tanque de alimentación con líquido.")
             st.write("2. Monitorear constantemente las válvulas de la línea de vapor vivo.")
@@ -558,5 +564,5 @@ elif st.session_state.current_window == 'Alerts':
     else:
         st.info("No se han registrado alertas hasta el momento.")
 
-#streamlit run app.py4
+#streamlit run app.py
 
