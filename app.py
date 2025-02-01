@@ -38,6 +38,17 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+#Set hover color to blue in all cases
+st.markdown("""
+    <style>
+    /* Hover de todos los botones */
+    .stButton > button:hover {
+        background-color: #4682B4; /* Azul acero claro */
+        color: white; /* Texto blanco */
+        border: 1px solid #1E90FF; /* Borde azul brillante */
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 
 st.image("logo.png", width=200)
@@ -64,9 +75,6 @@ def go_to_home():
 def simulation_module():
     st.session_state.current_window = 'Simulation'
 
-def recommendations():
-    st.session_state.current_window = 'Equipment Usage Recommendations'
-
 def procedures():
     st.session_state.current_window = 'Procedures'
 
@@ -86,7 +94,6 @@ def Alerts():
 st.sidebar.title("Navigation Menu")
 st.sidebar.button("General information", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
-st.sidebar.button("Equipment Usage Recommendations", on_click=recommendations)
 st.sidebar.button("Useful videos and pictures", on_click=visuals)
 st.sidebar.button("Procedures", on_click=procedures)
 st.sidebar.button("Repository/Reports", on_click=Repository)
@@ -255,40 +262,6 @@ elif st.session_state.current_window == 'Simulation':
                     results_df_display["Value"] = results_df_display["Value"].map(lambda x: f"{x:.2f}")  # Use 3 decimals
                     results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
                     st.write(results_df_display.to_html(), unsafe_allow_html=True)
-
-elif st.session_state.current_window == 'Equipment Usage Recommendations':
-    st.title("General recomendations to use the Equipment/Información y recomendaciones generales ")
-    st.write("SOME INFO")
-     # Verificar el estado del idioma dentro de Procedures
-    if 'language_Equipment' not in st.session_state:
-        st.session_state.language_Equipment = 'English'  # Idioma predeterminado para esta sección
-
-    # Botón para cambiar idioma dentro de Procedures
-    if st.button("Español" if st.session_state.language_Equipment == 'English' else "English"):
-        st.session_state.language_Equipment = 'Español' if st.session_state.language_Equipment == 'English' else 'English'
-
-    # Mostrar contenido según el idioma seleccionado
-    if st.session_state.language_Equipment == 'English':
-        st.markdown("""
-    - It should be considered that the steel of the equipment requires preheating to ensure the practice runs smoothly.
-    - Taking into account the initial temperature of the solution in the feed tank may explain the need for a higher amount of steam from the boiler.
-    - The level control valves of the tank that collects the steam produced in the effect must always remain closed to avoid breaking its glass. The feed tank level valves should remain open.
-    - For the steam from the boiler, it is recommended to maintain line pressure between 0.3 and 0.4; the valves required to achieve this should be controlled by **one person only**.
-    - **The steam line from the boiler should be the last to be activated and requires prior authorization from the instructor.**
-    """)
-    else:
-        st.markdown("""
-    - Identificar muy bien cada corriente, recuerde que esto ayuda a garantizar las condiciones de seguridad para todos en el laboratorio, con este propósito se marcaron las válvulas que deben usarse durante la operación de un efecto con cinta de color azul.
-    - Antes de iniciar la práctica cerciórese de que todos los tanques de recolección se encuentren vacíos y al finalizar vacié todo incluyendo el cuerpo del efecto, esto garantiza conservar los equipos en estado óptimo.
-    - La línea de vapor que proviene de la caldera debe ser la última en ser activada y la primera en cerrarse, recuerde obtener autorización del docente para permitir el paso de vapor al equipo""")
-    
-    st.title("Changes made")
-    st.markdown("""A steam flow control loop regulates the amount of steam in a pipe through an adjustable valve. It includes 
-    sensors and a controller that monitor the flow. The control strategy would be feedback control, where the measurement is taken at the pressure at the inlet of the effect, 
-    and the final action is performed on an automatic flow valve that restricts the steam entering the equipment. Thus, this control loop is classified as a system where the controlled variable 
-    is the pressure at the inlet of the effect, and the objective is to maintain it within a desired range to ensure efficient and safe operation of the equipment. The controller compares the actual pressure measurement
-     with the reference value or setpoint, generating a correction signal that adjusts the opening of the automatic valve to regulate the steam flow. This allows for compensation of external disturbances or changes in operating
-     conditions, ensuring stable and optimal process performance.""")
     
 elif st.session_state.current_window == 'Useful videos and pictures':
     st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
@@ -326,57 +299,179 @@ elif st.session_state.current_window == 'Useful videos and pictures':
     centered_image(r"Images_Evaporador\Manometro.jpeg", 400)
 
 elif st.session_state.current_window == 'Procedures':
-    st.subheader("Flow Diagram")
-    centered_image(r"Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 950)
-    st.subheader("Dlow Fiagram")
-    centered_image(r"Images_Evaporador\SolucionAgua.png", 950)
+    # Create columns to display the buttons
+    col1, col2, col3 = st.columns(3)
 
-    # Verificar el estado del idioma dentro de Procedures
-    if 'language_procedures' not in st.session_state:
-        st.session_state.language_procedures = 'English'  # Idioma predeterminado para esta sección
+    # Buttons centered and in the same leves
+    with col1:
+        if st.button("Manual de operación", key="manual_operacion", help="Manual de operación", use_container_width=True):
+            st.session_state.button_clicked = "Manual de operación"
+            
+    with col2:
+        if st.button("Recomendaciones", key="recomendaciones", help="Recomendaciones", use_container_width=True):
+            st.session_state.button_clicked = "Recomendaciones"
+            
+    with col3:
+        if st.button("Diagramas de flujo", key="diagramas_flujo", help="Diagramas de flujo", use_container_width=True):
+            st.session_state.button_clicked = "Diagramas de flujo"
+            # Specific color whe the mouse hovers
+    st.markdown("""
+        <style>
+        /* Estilos para los tres botones específicos */
+        div[class="stButton"] button:nth-of-type(1):hover,
+        div[class="stButton"] button:nth-of-type(2):hover,
+        div[class="stButton"] button:nth-of-type(3):hover {
+            background-color: #4682B4; /* Azul acero claro */
+            color: white; /* Texto blanco */
+            border: 1px solid #1E90FF; /* Borde azul brillante */
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    # Botón para cambiar idioma dentro de Procedures
-    if st.button("Español" if st.session_state.language_procedures == 'English' else "English"):
-        st.session_state.language_procedures = 'Español' if st.session_state.language_procedures == 'English' else 'English'
+    # Information depending on the button clicked
+    if st.session_state.button_clicked == "Manual de operación":
+            st.title("Protocolo de encendido")
 
-    # Mostrar contenido según el idioma seleccionado
-    if st.session_state.language_procedures == 'English':
-        st.markdown("""
-            The procedure to open the steam line is as follows: Before allowing steam to flow through the equipment, fill the entire effect body with the solution to be processed.
-            - First orange pressure gauge: Maintain close to 20 psi.
-            - Second blue pressure gauge: Adjust to approximately 10 psi.
-            - Pressure gauge with red valve below: Set between 5-10 psi.
-            After completing the practice, follow this same sequence.
+            st.write("1. Antes de iniciar la práctica cercióese de que todos los tanques de recolección se encuentren vacíos, al igual que el cuerpo del evaporador.")
 
-            The proper way to operate is as follows:
+            st.write("2. Identificación de válvulas para efecto simple con el Evaporador 1, se identifican las válvulas que deben estar abiertas durante la operación con cinta de color azul.")
+            centered_image(r"Images_Evaporador\cinta.jpg", width=200)
 
-            1. Load the evaporator with the solution to be used. Approximately 7.6 kg of solution is added, allowing the liquid to flow through the feed pump.
+            st.write("3. Control de nivel de los tanques")
+            st.write("- Las válvulas del control de nivel del tanque de recolección del vapor producido en el efecto deben permanecer cerradas.")
+            st.write("- Las válvulas del control de nivel del tanque de alimentación deben permanecer abiertas.")
 
-            2. Allow steam to flow into the equipment, recording the evaporator's temperature as a function of time, as well as the amount of high-pressure steam used.
+            st.write("4. Permita el paso de agua al cuerpo del evaporador abriendo las válvulas mostradas a continuación:")
+            centered_image(r"Images_Evaporador\agua.jpg", width=400)
 
-            3. The evaporation of the solution will be evident when mass is collected in the vapor collection tank. Record the temperature at which vapor begins to be collected. Perform measurements at intervals of 1-2 minutes until the practice is completed.
+            st.write("5. Encienda y tare todas las balanzas en los tanques de recolección")
+
+            st.write("6. Llene el tanque con al menos 20 kg de la solución a evaporar. No debe estar vacío durante la práctica.")
+
+            st.write("7. Conecte el enchufe trifásico para encender el equipo")
+
+            st.write("8. Conecte el computador al equipo y confirme que el computador tiene carga antes de iniciar.")
+            centered_image(r"Images_Evaporador\conectar.png", width=400)
+
+
+            st.write("""
+            9. Para encender debe girar por completo hacia la derecha la perilla, 
+            **<font color="blue">en color azul</font>** está el encendido general del equipo, 
+            el recuadro **<font color="ForestGreen">de color verde</font>** es el encendido de la bomba de alimento, 
+            el recuadro **<font color="orange">de color naranja</font>** es el indicador de luz que permite saber si la electroválvula está activa y llenando el evaporador 1, 
+            en el momento en que el evaporador esté lleno esta luz se apagará.
+            """, unsafe_allow_html=True)
+
+            centered_image(r"Images_Evaporador\tablero.png", width=500)
+
+            st.write("10. Encienda la \textbf{bomba de alimento} para cargar el evaporador con la solución a usar, este se llena con aproximadamente 8 kg de solución")
+
+            st.write("11. Acceda al programa **ASTRA RUN** el cual permite ver las temperaturas a lo largo del equipo.")
+            centered_image(r"Images_Evaporador\sw.png", width=400)
+
+            st.write("12. Activación de la línea de vapor")
+            st.write("""**<font color="red">La línea de vapor que proviene de la caldera debe ser la última en ser activada 
+                        y la primera en cerrarse, recuerde obtener autorización del docente para permitir el paso de vapor al equipo 
+                        y previamente debe solicitar que se encienda la caldera del LIQ.</font>**""", unsafe_allow_html=True)
+            st.write("13. Realice la apertura de las válvulas de la línea de vapor de forma lenta. El procedimiento a seguir es" )
+            st.write("a)  Antes de permitir el flujo de vapor por el equipo cargue todo el cuerpo del efecto con la solución a trabajar.")
+            st.write("**b)** Primer manómetro (naranja): mantener cerca a 20psi.")
+            centered_image(r"Images_Evaporador\llavenaranja.jpg", width=400)
+            st.write("**c)** Segundo manómetro (azul): Manipular hasta aproximadamente 10psi.")
+            centered_image(r"Images_Evaporador\azul.jpg", width=400)
+            st.write("**d)** Manómetro con válvula roja abajo 5-10 psi")
+            centered_image(r"Images_Evaporador\roja.jpg", width=400)
+
+            st.write("14. Permitir el paso de vapor al equipo, registrando la temperatura del evaporador en función del tiempo, al igual que el vapor de alta usado.")
+            st.write("15. La evaporación de la solución se evidencia al obtener masa en el tanque de recolección del condensado, registre la temperatura en la cual se empieza a recoger este vapor condensado.")
+            centered_image(r"Images_Evaporador\condensado.png", width=400)
+            st.markdown("""
+            Tanque de recolección del vapor condensado (**<font color="red">recuadro rojo</font>**), 
+            Tanque de alimentación (**<font color="yellow">recuadro amarillo</font>**)
+            """, unsafe_allow_html=True)
+            st.write("""16. Se debe considerar que el acero como tal del equipo debe tener un pre-calentamiento para asegurar un buen desarrollo de la práctica. 
+                        Mientras mayor sea el tiempo de este pre-calentamiento mejores serán los resultados, se recomienda que sea de mínimo 20 min.""")
+            st.write("""17. Si el equipo es utilizado con fines de llegar a una concentración en específico, se pueden utilizar las muestras
+                        obtenidas del licor final para someterlas a una cromatografía, espectrofotometría e incluso a un difractómetro
+                        para ver con precisión cuál es la concentración de la solución final. Adicional, en caso de trabajar con solución 
+                        salina se propone la opción de realizar este análisis de la concentración haciendo uso de la conductividad.""")
+            st.subheader("Para ensayos a vacío")
+            st.write("""
+            A partir del **paso 11** de la sección de **_Protocolo de encendido_** se debe seguir el siguiente proceso:
+
+            1. Abra las válvulas que permiten el paso de agua a la bomba de vacío, son las que se muestran
+                        **<font color="red">**Sin verificar que las válvulas estén abiertas no encienda la bomba de vacío**</font>.
+
+            2. Luego de verificar el suministro de agua a la bomba de vacío, encienda la bomba girando hacia la derecha la 
+                        perilla presente en el tablero, encerrada en el 
+                        recuadro **<font color="Plum">morado</font>** la cual se encuentra etiquetada como **_Bomba vacío_**.
+
+            3. El control del vacío se realiza cerrando la válvula mostrada en la imagen a continuación. 
+                        Cierre lentamente hasta llegar al vacío deseado que se recomienda esté entre -0.3 bar y -0.4 bar.
+
+            Si genera más vacío del deseado no abra inmediatamente para presurizar el sistema, deje el valor en el que se encuentra y rectifique sus cálculos según corresponda.
+            """, unsafe_allow_html=True)
+            centered_image(r"Images_Evaporador\tanquevcon.png", width=400)
+
+            st.write("4. A partir de este punto, continúe con el paso 12 de la sección de **_Protocolo de encendido_**.")
+
+            st.subheader("Protocolo de operación")
+            st.write("1. Mantener el tanque de alimentación con líquido.")
+            st.write("2. Monitorear constantemente las válvulas de la línea de vapor vivo.")
+            st.write("3. Tomar datos en función del tiempo de las variables de proceso.")
+
+            st.subheader("Protocolo de apagado")
+            st.write("1. Cerrar la línea de vapor en orden inverso al encendido.")
+            st.write("2. Apagar la bomba de vacío si está en uso.")
+            st.write("3. Apagar la bomba de alimento.")
+            st.write("4. Realizar el apagado general del equipo en el tablero.")
+            st.write("5. Desconectar el enchufe trifásico.")
+            st.write("6. Cerrar las válvulas de paso de agua.")
+            st.write("7. Vaciar todos los tanques, incluyendo el cuerpo del efecto.")
+            
+
+    elif st.session_state.button_clicked == "Recomendaciones":
+        
+        # Verificar el estado del idioma dentro de Procedures
+        if 'language_Equipment' not in st.session_state:
+            st.session_state.language_Equipment = 'English'  # Idioma predeterminado para esta sección
+
+        # Botón para cambiar idioma dentro de Procedures
+        if st.button("Español" if st.session_state.language_Equipment == 'English' else "English"):
+            st.session_state.language_Equipment = 'Español' if st.session_state.language_Equipment == 'English' else 'English'
+
+        # Mostrar contenido según el idioma seleccionado
+        if st.session_state.language_Equipment == 'English':
+            st.title("General recomendations to use the Equipment")
+            st.markdown("""
+        - It should be considered that the steel of the equipment requires preheating to ensure the practice runs smoothly.
+        - Taking into account the initial temperature of the solution in the feed tank may explain the need for a higher amount of steam from the boiler.
+        - The level control valves of the tank that collects the steam produced in the effect must always remain closed to avoid breaking its glass. The feed tank level valves should remain open.
+        - For the steam from the boiler, it is recommended to maintain line pressure between 10psig ; the valves required to achieve this should be controlled by **one person only**.
+        - **The steam line from the boiler should be the last to be activated and requires prior authorization from the instructor.**
         """)
-    else:
-        st.markdown("""
-            El procedimiento para abrir la línea de vapor es el siguiente: Antes de permitir el flujo de vapor por el equipo, cargue todo el cuerpo del efecto con la solución a trabajar.
-            - Primer manómetro naranja: mantener cerca a 20 psi.
-            - Segundo manómetro azul: Manipular hasta aproximadamente 10 psi.
-            - Manómetro con válvula roja abajo: entre 5-10 psi.
-            Al acabar la práctica siga esta misma secuencia.
+        else:
+            st.title("Información y recomendaciones generales ")
+            st.markdown("""
+        - Identificar muy bien cada corriente, recuerde que esto ayuda a garantizar las condiciones de seguridad para todos en el laboratorio, con este propósito se marcaron las válvulas que deben usarse durante la operación de un efecto con cinta de color azul.
+        - Antes de iniciar la práctica cerciórese de que todos los tanques de recolección se encuentren vacíos y al finalizar vacié todo incluyendo el cuerpo del efecto, esto garantiza conservar los equipos en estado óptimo.
+        - La línea de vapor que proviene de la caldera debe ser la última en ser activada y la primera en cerrarse, recuerde obtener autorización del docente para permitir el paso de vapor al equipo""")
+        
 
-            La manera adecuada de operar es:
-
-            1. Cargar el evaporador con la solución a usar. Este se llena con aproximadamente 7.6 kg de solución, permitiendo el flujo de líquido a través de la bomba de alimento.
-
-            2. Permitir el paso de vapor al equipo, registrando la temperatura del evaporador en función del tiempo, así como el vapor de alta usado.
-
-            3. La evaporación de la solución se evidenciará al obtener masa en el tanque de recolección del vapor. Registre la temperatura en la cual se empieza a recoger este vapor. Realizar mediciones en intervalos de 1-2 minutos hasta acabar la práctica.
-        """)
-
-
-elif st.session_state.current_window == 'Repository/Reports':
-    st.title("Visualizar PDF como imágenes")
+    elif st.session_state.button_clicked == "Diagramas de flujo":
+        st.subheader("Flow Diagram")
+        centered_image(r"Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 950)
     
+
+elif st.session_state.current_window == 'Repository / Reports':
+    st.title("Visualizar PDF como imágenes")
+    st.title("Changes made")
+    st.markdown("""A steam flow control loop regulates the amount of steam in a pipe through an adjustable valve. It includes 
+    sensors and a controller that monitor the flow. The control strategy would be feedback control, where the measurement is taken at the pressure at the inlet of the effect, 
+    and the final action is performed on an automatic flow valve that restricts the steam entering the equipment. Thus, this control loop is classified as a system where the controlled variable 
+    is the pressure at the inlet of the effect, and the objective is to maintain it within a desired range to ensure efficient and safe operation of the equipment. The controller compares the actual pressure measurement
+     with the reference value or setpoint, generating a correction signal that adjusts the opening of the automatic valve to regulate the steam flow. This allows for compensation of external disturbances or changes in operating
+     conditions, ensuring stable and optimal process performance.""")
 
     pdf_path = "Images_Evaporador/Evaporador - planos.pdf"
 
@@ -463,4 +558,5 @@ elif st.session_state.current_window == 'Alerts':
     else:
         st.info("No se han registrado alertas hasta el momento.")
 
-#streamlit run app.py
+#streamlit run app.py4
+
