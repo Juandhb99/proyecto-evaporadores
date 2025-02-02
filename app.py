@@ -300,11 +300,12 @@ elif st.session_state.current_window == 'Useful videos and pictures':
 
 elif st.session_state.current_window == 'Procedures':
     st.title("Procesos importantes")
+    st.write("""En esta sección presione el botón de la información que desea consultar""")
     # Create columns to display the buttons
     if "button_clicked" not in st.session_state:
      st.session_state.button_clicked = None  # o cualquier valor predeterminado
      
-     st.write("""En esta sección presione el botón de la información que desea consultar""")
+     
     col1, col2, col3 = st.columns(3)
 
     # Buttons centered and in the same leves
@@ -335,6 +336,7 @@ elif st.session_state.current_window == 'Procedures':
 
     # Information depending on the button clicked
     if st.session_state.button_clicked == "Manual de operación":
+            st.write("""Para facilitar el acceso al protocolo de quienes usen el banco de evaporadores ésta sección se suministra en español únicamente""")
             st.header("Protocolo de encendido")
 
             st.write("1. Antes de iniciar la práctica cercióese de que todos los tanques de recolección se encuentren vacíos, al igual que el cuerpo del evaporador.")
@@ -465,7 +467,8 @@ elif st.session_state.current_window == 'Procedures':
         
 
     elif st.session_state.button_clicked == "Diagramas de flujo":
-        st.subheader("Flow Diagram")
+        st.write("""Para facilitar el acceso al protocolo de quienes usen el banco de evaporadores la sección se suministra en español únicamente""")
+        st.subheader("Diagrama de flujo")
         centered_image(r"Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 950)
     
 
