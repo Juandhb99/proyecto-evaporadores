@@ -1,17 +1,6 @@
-import tkinter as tk
-from tkinter import simpledialog
-from CoolProp.CoolProp import PropsSI
-def ask_for_inputs():
-    root = tk.Tk()
-    root.withdraw()
-    F = float(simpledialog.askstring("Input", "Enter the initial flow (kg):"))
-    xf = float(simpledialog.askstring("Input", "Enter the concentration of the feed flow (% w/w):"))
-    Tf = float(simpledialog.askstring("Input", "Enter the feed temperature (K):"))
-    P1 = float(simpledialog.askstring("Input", "Enter the pressure inside the effect (Pa):"))
-    Ps = float(simpledialog.askstring("Input", "Enter the steam pressure (Pa):"))
-    xL = float(simpledialog.askstring("Input", "Enter the concentration of the output flow (% w/w):"))
 
-    return xf, Tf, P1, Ps, F, xL
+from CoolProp.CoolProp import PropsSI
+
 def material_balance(F:float,xf:float,xL:float):
     """
     Calculates the material balance in an evaporator.
