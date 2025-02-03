@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI
 from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
 from pdf2image import convert_from_path
-import fitz  # PyMuPDF
+#import fitz  # PyMuPDF
 from PIL import Image
 import time
 
@@ -484,12 +484,12 @@ elif st.session_state.current_window == 'Repository / Reports':
 
     pdf_path = "Images_Evaporador/Evaporador - planos.pdf"
 
-    doc = fitz.open(pdf_path)
-    for page_number in range(len(doc)):
-        page = doc.load_page(page_number)
-        pix = page.get_pixmap()
-        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-        st.image(img, use_column_width=True)
+#    doc = fitz.open(pdf_path)
+    #for page_number in range(len(doc)):
+     #   page = doc.load_page(page_number)
+      #  pix = page.get_pixmap()
+      #  img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+       # st.image(img, use_column_width=True)
 
 elif st.session_state.current_window == 'Dashboard':
     st.title("Real-Time Dashboard")
