@@ -296,7 +296,7 @@ elif st.session_state.current_window == 'Useful videos and pictures':
     centered_image(r"Images_Evaporador\TuberiaPeligrosa.jpeg", 400)
 
     st.subheader("Manometer")
-    centered_image(r"Images_Evaporador\Manometro.jpeg", 400)
+    centered_image(r"C:\Users\marti\OneDrive - Universidad Nacional de Colombia\Documentos\proyecto-evaporadores\Images_Evaporador\Manometro.jpeg", 400)
 
 elif st.session_state.current_window == 'Procedures':
     st.title("Procesos importantes")
