@@ -337,14 +337,14 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
             """, unsafe_allow_html=True)
             if st.session_state.button_clicked == "Blueprints":
                     st.subheader("Blueprints")
-                    centered_image(r"Evaporador - planos_page-0001.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0002.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0003.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0004.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0005.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0006.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0007.jpg", 400)
-                    centered_image(r"Evaporador - planos_page-0008.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0001.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0002.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0003.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0004.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0005.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0006.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0007.jpg", 950)
+                    centered_image(r"Evaporador - planos_page-0008.jpg", 950)
 
     elif st.session_state.button_clicked == "Pictures":
             st.header("Tanks")
