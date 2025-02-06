@@ -70,6 +70,19 @@ if 'current_window' not in st.session_state:
 # Functions to change the window
 def go_to_home():
     st.session_state.current_window = 'General information'
+def show_help_button():
+    st.markdown(
+        """
+        <div style='position: fixed; bottom: 10px; width: 100%; text-align: center; z-index: 1000;'>
+            <button style='background-color: #1E90FF; color: white; border: none; padding: 10px 20px; 
+            font-size: 16px; border-radius: 5px; cursor: pointer;' 
+            onclick="window.alert('This is the help button. It provides guidance for navigating the interface.')">
+                Help
+            </button>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 def simulation_module():
     st.session_state.current_window = 'Simulation'
@@ -607,5 +620,7 @@ elif st.session_state.current_window == 'Alerts':
     else:
         st.info("No se han registrado alertas hasta el momento.")
 
+# Llamar a la función para mostrar el botón al final de la página
+show_help_button()
 #streamlit run app.py
 
