@@ -296,38 +296,65 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
         st.subheader("Feed Tank")
         centered_image(r"feed.jpg", 400)
     elif st.session_state.button_clicked == "Repository":
-        st.subheader("Feed Tank")
-        centered_image(r"feed.jpg", 400)
+        # Buttons centered and in the same leves
+                
+            col7, col8,col9 = st.columns(3)
+            with col7:
+                if st.button("Blueprints", key="blueprints", help="Blueprints", use_container_width=True):
+                    st.session_state.button_clicked = "Blueprints"
+                    
+            with col8:
+                if st.button("Report", key="report", help="Report", use_container_width=True):
+                    st.session_state.button_clicked = "Report"
+            with col9:
+                if st.button("Prelab", key="prelab", help="Prelab", use_container_width=True):
+                    st.session_state.button_clicked = "Prelab"   
+
+                    # Specific color whe the mouse hovers
+            st.markdown("""
+                <style>
+                /* Estilos para los tres botones específicos */
+                div[class="stButton"] button:nth-of-type(1):hover,
+                div[class="stButton"] button:nth-of-type(2):hover,
+                div[class="stButton"] button:nth-of-type(3):hover {
+                    background-color: #4682B4; /* Azul acero claro */
+                    color: white; /* Texto blanco */
+                    border: 1px solid #1E90FF; /* Borde azul brillante */
+                }
+                </style>
+            """, unsafe_allow_html=True)
 
     elif st.session_state.button_clicked == "Pictures":
-     st.header("Tanks")
-    # Feed Tank
-    st.subheader("Feed Tank")
-    centered_image(r"feed.jpg", 400)
-    # Condensed Steam Tank
-    st.subheader("Vapor valve")
-    centered_image(r"EntradaVapor.jpeg", 400)
-    st.subheader("Second vapor valve")
-    centered_image(r"EntradaVapor2.jpeg", 400)
-    # Condensed Vapor Tank
-    st.subheader("Broken valve")
-    centered_image(r"LlaveDanada.jpeg", 400)
+            st.header("Tanks")
+            # Feed Tank
+            st.subheader("Feed Tank")
+            centered_image(r"feed.jpg", 400)
+            # Condensed Steam Tank
+            st.subheader("Vapor valve")
+            centered_image(r"EntradaVapor.jpeg", 400)
+            st.subheader("Second vapor valve")
+            centered_image(r"EntradaVapor2.jpeg", 400)
+            # Condensed Vapor Tank
+            st.subheader("Broken valve")
+            centered_image(r"LlaveDanada.jpeg", 400)
 
-    st.subheader("Tapes on the lines")
-    centered_image(r"ReferenciasMarcadas.jpeg", 400)
+            st.subheader("Tapes on the lines")
+            centered_image(r"ReferenciasMarcadas.jpeg", 400)
 
-    st.subheader("New balances")
-    centered_image(r"NuevasBalanzas.jpeg", 400)
+            st.subheader("New balances")
+            centered_image(r"NuevasBalanzas.jpeg", 400)
 
-    st.subheader("Short pipe")
-    centered_image(r"TuberiaCorta.jpeg", 400)
+            st.subheader("Short pipe")
+            centered_image(r"TuberiaCorta.jpeg", 400)
 
-    st.subheader("Dangerous pipe")
-    centered_image(r"TuberiaPeligrosa.jpeg", 400)
+            st.subheader("Dangerous pipe")
+            centered_image(r"TuberiaPeligrosa.jpeg", 400)
 
-    st.subheader("Manometer")
-    centered_image(r"Manometro.jpeg", 400)
+            st.subheader("Manometer")
+            centered_image(r"Manometro.jpeg", 400)
 
+
+   
 
    
 elif st.session_state.current_window == 'Procedures':
