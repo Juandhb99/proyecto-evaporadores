@@ -78,10 +78,8 @@ def procedures():
     st.session_state.current_window = 'Procedures'
 
 def visuals():
-    st.session_state.current_window = 'Useful videos and pictures'
+    st.session_state.current_window = 'Videos, pictures and repository'
 
-def Repository():
-    st.session_state.current_window = 'Repository/Reports'
 
 def Dashboard():
     st.session_state.current_window = 'Dashboard'
@@ -93,9 +91,9 @@ def Alerts():
 st.sidebar.title("Navigation Menu")
 st.sidebar.button("General information", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
-st.sidebar.button("Useful videos and pictures", on_click=visuals)
+st.sidebar.button("Videos, pictures and repository", on_click=visuals)
 st.sidebar.button("Procedures", on_click=procedures)
-st.sidebar.button("Repository/Reports", on_click=Repository)
+
 st.sidebar.button("Dashboard", on_click=Dashboard)
 st.sidebar.button("Alerts",on_click=Alerts)
 #-------------------------------------------------------------------------------------
@@ -270,12 +268,12 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
  # Buttons centered and in the same leves
     col4, col5 = st.columns(3)
     with col4:
-        if st.button("Manual de operación", key="manual_operacion", help="Manual de operación", use_container_width=True):
-            st.session_state.button_clicked = "Manual de operación"
+        if st.button("Videos", key="Videos", help="Videos", use_container_width=True):
+            st.session_state.button_clicked = "Videos"
             
     with col5:
-        if st.button("Recomendaciones", key="recomendaciones", help="Recomendaciones", use_container_width=True):
-            st.session_state.button_clicked = "Recomendaciones"
+        if st.button("Pictures", key="Pictures", help="Pictures", use_container_width=True):
+            st.session_state.button_clicked = "Pictures"
             
             # Specific color whe the mouse hovers
     st.markdown("""
@@ -290,8 +288,11 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
         }
         </style>
     """, unsafe_allow_html=True)
-    
-    st.header("Tanks")
+    if st.session_state.button_clicked == "Videos":
+        st.subheader("Feed Tank")
+        centered_image(r"feed.jpg", 400)
+    if st.session_state.button_clicked == "Pictures":
+     st.header("Tanks")
     # Feed Tank
     st.subheader("Feed Tank")
     centered_image(r"feed.jpg", 400)
@@ -319,6 +320,8 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
     st.subheader("Manometer")
     centered_image(r"Manometro.jpeg", 400)
 
+
+   
 elif st.session_state.current_window == 'Procedures':
     st.title("Procesos importantes")
     st.write("""En esta sección presione el botón de la información que desea consultar""")
@@ -493,24 +496,7 @@ elif st.session_state.current_window == 'Procedures':
         centered_image(r"Diagrama de flujo_OperacionAGUA.png", 950)
     
 
-elif st.session_state.current_window == 'Repository / Reports':
-    st.title("Visualizar PDF como imágenes")
-    st.title("Changes made")
-    st.markdown("""A steam flow control loop regulates the amount of steam in a pipe through an adjustable valve. It includes 
-    sensors and a controller that monitor the flow. The control strategy would be feedback control, where the measurement is taken at the pressure at the inlet of the effect, 
-    and the final action is performed on an automatic flow valve that restricts the steam entering the equipment. Thus, this control loop is classified as a system where the controlled variable 
-    is the pressure at the inlet of the effect, and the objective is to maintain it within a desired range to ensure efficient and safe operation of the equipment. The controller compares the actual pressure measurement
-     with the reference value or setpoint, generating a correction signal that adjusts the opening of the automatic valve to regulate the steam flow. This allows for compensation of external disturbances or changes in operating
-     conditions, ensuring stable and optimal process performance.""")
 
-    pdf_path = "Images_Evaporador/Evaporador - planos.pdf"
-
-#    doc = fitz.open(pdf_path)
-    #for page_number in range(len(doc)):
-     #   page = doc.load_page(page_number)
-      #  pix = page.get_pixmap()
-      #  img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-       # st.image(img, use_column_width=True)
 
 elif st.session_state.current_window == 'Dashboard':
     st.title("Real-Time Dashboard")
