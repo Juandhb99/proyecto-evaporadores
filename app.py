@@ -272,31 +272,30 @@ elif st.session_state.current_window == 'Useful videos and pictures':
     st.header("Tanks")
     # Feed Tank
     st.subheader("Feed Tank")
-    centered_image(r"Images_Evaporador\feed.jpg", 400)
+    centered_image(r"feed.jpg", 400)
     # Condensed Steam Tank
     st.subheader("Vapor valve")
-    centered_image(r"Images_Evaporador\EntradaVapor.jpeg", 400)
+    centered_image(r"EntradaVapor.jpeg", 400)
     st.subheader("Second vapor valve")
-    centered_image(r"Images_Evaporador\EntradaVapor2.jpeg", 400)
-
+    centered_image(r"EntradaVapor2.jpeg", 400)
     # Condensed Vapor Tank
     st.subheader("Broken valve")
-    centered_image(r"Images_Evaporador\LlaveDanada.jpeg", 400)
+    centered_image(r"LlaveDanada.jpeg", 400)
 
     st.subheader("Tapes on the lines")
-    centered_image(r"Images_Evaporador\ReferenciasMarcadas.jpeg", 400)
+    centered_image(r"ReferenciasMarcadas.jpeg", 400)
 
     st.subheader("New balances")
-    centered_image(r"Images_Evaporador\NuevasBalanzas.jpeg", 400)
+    centered_image(r"NuevasBalanzas.jpeg", 400)
 
     st.subheader("Short pipe")
-    centered_image(r"Images_Evaporador\TuberiaCorta.jpeg", 400)
+    centered_image(r"TuberiaCorta.jpeg", 400)
 
     st.subheader("Dangerous pipe")
-    centered_image(r"Images_Evaporador\TuberiaPeligrosa.jpeg", 400)
+    centered_image(r"TuberiaPeligrosa.jpeg", 400)
 
     st.subheader("Manometer")
-    centered_image(r"C:\Users\marti\OneDrive - Universidad Nacional de Colombia\Documentos\proyecto-evaporadores\Images_Evaporador\Manometro.jpeg", 400)
+    centered_image(r"Manometro.jpeg", 400)
 
 elif st.session_state.current_window == 'Procedures':
     st.title("Procesos importantes")
@@ -342,14 +341,14 @@ elif st.session_state.current_window == 'Procedures':
             st.write("1. Antes de iniciar la práctica cercióese de que todos los tanques de recolección se encuentren vacíos, al igual que el cuerpo del evaporador.")
 
             st.write("2. Identificación de válvulas para efecto simple con el Evaporador 1, se identifican las válvulas que deben estar abiertas durante la operación con cinta de color azul.")
-            centered_image(r"Images_Evaporador\cinta.jpg", width=200)
+            centered_image(r"cinta.jpg", width=200)
 
             st.write("3. Control de nivel de los tanques")
             st.write("- Las válvulas del control de nivel del tanque de recolección del vapor producido en el efecto deben permanecer cerradas.")
             st.write("- Las válvulas del control de nivel del tanque de alimentación deben permanecer abiertas.")
 
             st.write("4. Permita el paso de agua al cuerpo del evaporador abriendo las válvulas mostradas a continuación:")
-            centered_image(r"Images_Evaporador\agua.jpg", width=400)
+            centered_image(r"agua.jpg", width=400)
 
             st.write("5. Encienda y tare todas las balanzas en los tanques de recolección")
 
@@ -358,7 +357,7 @@ elif st.session_state.current_window == 'Procedures':
             st.write("7. Conecte el enchufe trifásico para encender el equipo")
 
             st.write("8. Conecte el computador al equipo y confirme que el computador tiene carga antes de iniciar.")
-            centered_image(r"Images_Evaporador\conectar.png", width=400)
+            centered_image(r"conectar.png", width=400)
 
 
             st.write("""
@@ -369,12 +368,12 @@ elif st.session_state.current_window == 'Procedures':
             en el momento en que el evaporador esté lleno esta luz se apagará.
             """, unsafe_allow_html=True)
 
-            centered_image(r"Images_Evaporador\tablero.png", width=500)
+            centered_image(r"tablero.png", width=500)
 
             st.write("10. Encienda la \textbf{bomba de alimento} para cargar el evaporador con la solución a usar, este se llena con aproximadamente 8 kg de solución")
 
             st.write("11. Acceda al programa **ASTRA RUN** el cual permite ver las temperaturas a lo largo del equipo.")
-            centered_image(r"Images_Evaporador\sw.png", width=400)
+            centered_image(r"sw.png", width=400)
 
             st.write("12. Activación de la línea de vapor")
             st.write("""**<font color="red">La línea de vapor que proviene de la caldera debe ser la última en ser activada 
@@ -383,15 +382,15 @@ elif st.session_state.current_window == 'Procedures':
             st.write("13. Realice la apertura de las válvulas de la línea de vapor de forma lenta. El procedimiento a seguir es" )
             st.write("a)  Antes de permitir el flujo de vapor por el equipo cargue todo el cuerpo del efecto con la solución a trabajar.")
             st.write("**b)** Primer manómetro (naranja): mantener cerca a 20psi.")
-            centered_image(r"Images_Evaporador\llavenaranja.jpg", width=400)
+            centered_image(r"llavenaranja.jpg", width=400)
             st.write("**c)** Segundo manómetro (azul): Manipular hasta aproximadamente 10psi.")
-            centered_image(r"Images_Evaporador\azul.jpg", width=400)
+            centered_image(r"azul.jpg", width=400)
             st.write("**d)** Manómetro con válvula roja abajo 5-10 psi")
-            centered_image(r"Images_Evaporador\roja.jpg", width=400)
+            centered_image(r"roja.jpg", width=400)
 
             st.write("14. Permitir el paso de vapor al equipo, registrando la temperatura del evaporador en función del tiempo, al igual que el vapor de alta usado.")
             st.write("15. La evaporación de la solución se evidencia al obtener masa en el tanque de recolección del condensado, registre la temperatura en la cual se empieza a recoger este vapor condensado.")
-            centered_image(r"Images_Evaporador\condensado.png", width=400)
+            centered_image(r"condensado.png", width=400)
             st.markdown("""
             Tanque de recolección del vapor condensado (**<font color="red">recuadro rojo</font>**), 
             Tanque de alimentación (**<font color="yellow">recuadro amarillo</font>**)
@@ -419,7 +418,7 @@ elif st.session_state.current_window == 'Procedures':
 
             Si genera más vacío del deseado no abra inmediatamente para presurizar el sistema, deje el valor en el que se encuentra y rectifique sus cálculos según corresponda.
             """, unsafe_allow_html=True)
-            centered_image(r"Images_Evaporador\tanquevcon.png", width=400)
+            centered_image(r"tanquevcon.png", width=400)
 
             st.write("4. A partir de este punto, continúe con el paso 12 de la sección de **_Protocolo de encendido_**.")
             #----------------------------------------------
@@ -469,7 +468,7 @@ elif st.session_state.current_window == 'Procedures':
     elif st.session_state.button_clicked == "Diagramas de flujo":
         st.write("""Para facilitar el acceso al protocolo de quienes usen el banco de evaporadores la sección se suministra en español únicamente""")
         st.subheader("Diagrama de flujo")
-        centered_image(r"Images_Evaporador\Diagrama de flujo_OperacionAGUA.png", 950)
+        centered_image(r"Diagrama de flujo_OperacionAGUA.png", 950)
     
 
 elif st.session_state.current_window == 'Repository / Reports':
