@@ -266,7 +266,7 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
     reinforce usage recommendations. Through these visual representations, the goal is to simplify the technical interpretation 
     of key aspects of the system, from tank feed to critical equipment connections.""" )
  # Buttons centered and in the same leves
-    col4, col5 = st.columns(3)
+    col4, col5,col6 = st.columns(3)
     with col4:
         if st.button("Videos", key="videos", help="Videos", use_container_width=True):
             st.session_state.button_clicked = "Videos"
@@ -274,7 +274,10 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
     with col5:
         if st.button("Pictures", key="pictures", help="Pictures", use_container_width=True):
             st.session_state.button_clicked = "Pictures"
-            
+    with col6:
+        if st.button("Repository", key="repository", help="Repository", use_container_width=True):
+            st.session_state.button_clicked = "Repository"   
+
             # Specific color whe the mouse hovers
     st.markdown("""
         <style>
@@ -290,6 +293,9 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
     """, unsafe_allow_html=True)
 
     if st.session_state.button_clicked == "Videos":
+        st.subheader("Feed Tank")
+        centered_image(r"feed.jpg", 400)
+    elif st.session_state.button_clicked == "Repository":
         st.subheader("Feed Tank")
         centered_image(r"feed.jpg", 400)
 
