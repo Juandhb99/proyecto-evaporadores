@@ -4,7 +4,6 @@ import numpy as np
 from CoolProp.CoolProp import PropsSI
 from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
 from Properties.Propertiesdef import properties_prediction, training
-from pdf2image import convert_from_path
 #import fitz  # PyMuPDF
 from PIL import Image
 import time
@@ -263,12 +262,35 @@ elif st.session_state.current_window == 'Simulation':
                     results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
                     st.write(results_df_display.to_html(), unsafe_allow_html=True)
     
-elif st.session_state.current_window == 'Useful videos and pictures':
+elif st.session_state.current_window == 'Videos, pictures and repository':
     st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
     These images provide visual support to better understand the operation of the equipment, identify potential failures, and 
     reinforce usage recommendations. Through these visual representations, the goal is to simplify the technical interpretation 
     of key aspects of the system, from tank feed to critical equipment connections.""" )
-
+ # Buttons centered and in the same leves
+    col4, col5 = st.columns(3)
+    with col4:
+        if st.button("Manual de operación", key="manual_operacion", help="Manual de operación", use_container_width=True):
+            st.session_state.button_clicked = "Manual de operación"
+            
+    with col5:
+        if st.button("Recomendaciones", key="recomendaciones", help="Recomendaciones", use_container_width=True):
+            st.session_state.button_clicked = "Recomendaciones"
+            
+            # Specific color whe the mouse hovers
+    st.markdown("""
+        <style>
+        /* Estilos para los tres botones específicos */
+        div[class="stButton"] button:nth-of-type(1):hover,
+        div[class="stButton"] button:nth-of-type(2):hover,
+        div[class="stButton"] button:nth-of-type(3):hover {
+            background-color: #4682B4; /* Azul acero claro */
+            color: white; /* Texto blanco */
+            border: 1px solid #1E90FF; /* Borde azul brillante */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
     st.header("Tanks")
     # Feed Tank
     st.subheader("Feed Tank")
