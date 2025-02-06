@@ -268,11 +268,11 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
  # Buttons centered and in the same leves
     col4, col5 = st.columns(3)
     with col4:
-        if st.button("Videos", key="Videos", help="Videos", use_container_width=True):
+        if st.button("Videos", key="videos", help="Videos", use_container_width=True):
             st.session_state.button_clicked = "Videos"
             
     with col5:
-        if st.button("Pictures", key="Pictures", help="Pictures", use_container_width=True):
+        if st.button("Pictures", key="pictures", help="Pictures", use_container_width=True):
             st.session_state.button_clicked = "Pictures"
             
             # Specific color whe the mouse hovers
@@ -288,10 +288,12 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
         }
         </style>
     """, unsafe_allow_html=True)
+
     if st.session_state.button_clicked == "Videos":
         st.subheader("Feed Tank")
         centered_image(r"feed.jpg", 400)
-    if st.session_state.button_clicked == "Pictures":
+
+    elif st.session_state.button_clicked == "Pictures":
      st.header("Tanks")
     # Feed Tank
     st.subheader("Feed Tank")
@@ -495,8 +497,6 @@ elif st.session_state.current_window == 'Procedures':
         st.subheader("Diagrama de flujo")
         centered_image(r"Diagrama de flujo_OperacionAGUA.png", 950)
     
-
-
 
 elif st.session_state.current_window == 'Dashboard':
     st.title("Real-Time Dashboard")
