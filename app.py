@@ -97,8 +97,8 @@ def visuals():
 def Dashboard():
     st.session_state.current_window = 'Dashboard'
 
-def Alerts():
-    st.session_state.current_window = 'Alerts'
+def Safetycheck():
+    st.session_state.current_window = 'Safety check'
 
 #  Navigation menu options
 st.sidebar.title("Navigation Menu")
@@ -106,9 +106,8 @@ st.sidebar.button("General information", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
 st.sidebar.button("Videos, pictures and repository", on_click=visuals)
 st.sidebar.button("Procedures", on_click=procedures)
-
 st.sidebar.button("Dashboard", on_click=Dashboard)
-st.sidebar.button("Alerts",on_click=Alerts)
+st.sidebar.button("Safety check",on_click=Safetycheck)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'General information':
@@ -336,6 +335,16 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
                 }
                 </style>
             """, unsafe_allow_html=True)
+            if st.session_state.button_clicked == "Blueprints":
+                    st.subheader("Blueprints")
+                    centered_image(r"Evaporador - planos_page-0001.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0002.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0003.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0004.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0005.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0006.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0007.jpg", 400)
+                    centered_image(r"Evaporador - planos_page-0008.jpg", 400)
 
     elif st.session_state.button_clicked == "Pictures":
             st.header("Tanks")
@@ -561,7 +570,7 @@ elif st.session_state.current_window == 'Dashboard':
         data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
         st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
         time.sleep(1)
-elif st.session_state.current_window == 'Alerts':
+elif st.session_state.current_window == 'Safety check':
     st.title("🔴 Control de Seguridad del Evaporador")
 
     # *Rangos de Seguridad*
