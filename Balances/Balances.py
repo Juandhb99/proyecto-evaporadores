@@ -140,7 +140,7 @@ def energy_balancem(xf:float,Tf: float,P1: float,T1: float,Ps:float,F:float,V: f
     #Enthalpies of the process
     Hv=PropsSI('H', 'P', P1, 'Q', 1, 'Water') # Produced vapor at P1,T1 without solute
     hf=PropsSI('H', 'T', Tf, 'P', 101325, 'Water')
-    hL=PropsSI('H', 'T', T1, 'P', P1, 'Water')#Liquor entalphy at T1,xL
+    hL=PropsSI('H', 'T', T1, 'Q', 0, 'Water')#Liquor entalphy at T1,xL
     a1, a2, a3, a4, a5,a6,a7,a8,a9,a10 = (-2.348e4, 3.152e5, 2.803e6, -1.446e5, 7.826e03,-4.417e1,2.139e-1,-1.991e4,2.778e4,9.728e1)
     sF=xf/100
     sL=xL/100
