@@ -2,12 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from CoolProp.CoolProp import PropsSI
-from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP
-from Properties.Propertiesdef import properties_prediction, training
+from Balances.Balances import material_balance, Boling_Point_Elevation, energy_balancem, COP,simulate_evaporation,plot_evaporation_with_altair
 #import fitz  # PyMuPDF
 from PIL import Image
 import time
-
 #---------------------------------------------------------------------------------
 st.markdown("""
     <style>
@@ -272,6 +270,63 @@ elif st.session_state.current_window == 'Simulation':
                     results_df_display=results_df_display.style.set_properties(**{'text-align': 'center'}).set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]}])
                     st.write(results_df_display.to_html(), unsafe_allow_html=True)
     
+    if simulation_type == "Transient state":
+        st.header("Trasient state simulation")
+        st.write("This simulation is prepared for salt-water mixtures")
+        # Asking for values from the user as numbers
+        st.subheader("Enter Initial Conditions")
+        M_init = st.number_input("Enter the initial mass (kg):", min_value=0.0, format="%.2f")
+        T_init = st.number_input("Enter the initial temperature inside the effect (K):", min_value=0.0, format="%.2f")
+        time_s = st.number_input("Enter the time for the simulation (min):", min_value=0.0, format="%.2f")
+        T_f = st.number_input("Enter the feed temperature (K):", min_value=0.0, format="%.2f")
+        P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
+        Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
+        xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
+        xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
+                    
+        if st.button("Submit", key="submit_simulation"):
+            # Validación de entradas
+            valid_inputs = True
+
+            if M_init <= 0:
+                st.error("Error: The flow must be greater than 0 kg.")
+                valid_inputs = False
+            if T_f < 273.153:
+                st.error("Error: The feed temperature must be greater than 273.153 K.")
+                valid_inputs = False
+            if time_s < 5:
+                st.error("Error: The time for the simulation must be greater than 5 min.")
+                valid_inputs = False
+            if T_init < 273.153:
+                st.error("Error: The feed temperature must be greater than 273.153 K.")
+                valid_inputs = False
+            if P1 < 611.655 or P1 > 2.2064e+07:
+                st.error("Error: The pressure inside the effect must be greater than 611.655 Pa.")
+                valid_inputs = False
+            if Ps < 611.655 or Ps > 2.2064e+07:
+                st.error("Error: The steam pressure must be greater than 611.655 Pa.")
+                valid_inputs = False
+            if xL < 0 or xL > 16:
+                st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
+                valid_inputs = False
+            if xf < 0 or xf > 16:
+                st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
+                valid_inputs = False
+
+            if valid_inputs:
+                st.success("The initial data has been successfully uploaded.")
+
+                P = 74000  # Atmospheric pressure (Pa)
+                x_f = xf / 100
+                x_L = xL / 100
+                M_salt_init = M_init * x_f
+                total_time = time_s * 60
+
+                results = simulate_evaporation(total_time, M_init, M_salt_init, T_init, P1, Ps, P, x_f, T_f)
+                st.header("Plots for the evaporation process")
+                plot_evaporation_with_altair(results)
+
+
 elif st.session_state.current_window == 'Videos, pictures and repository':
     st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
     These images provide visual support to better understand the operation of the equipment, identify potential failures, and 
@@ -570,6 +625,7 @@ elif st.session_state.current_window == 'Dashboard':
         data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
         st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
         time.sleep(1)
+
 elif st.session_state.current_window == 'Safety check':
     st.title("🔴 Control de Seguridad del Evaporador")
 
