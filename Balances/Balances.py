@@ -304,71 +304,86 @@ def simulate_evaporation(total_time, M_init, M_salt_init, T_init, P1, Ps, P, x_f
                 "concentration_pct": concentration_list,
                 "T_eb": T_eb  # Include boiling point in the output
             }
+import numpy as np
+import pandas as pd
+import altair as alt
+import streamlit as st
+
 def plot_evaporation_with_altair(results):
-            time_min = [t / 60 for t in results["time"]]
-            df = pd.DataFrame({
-                "Time (min)": time_min,
-                "Mass (kg)": results["mass"],
-                "Temperature (°C)": results["temperature_C"],
-                "Salt Concentration (%)": results["concentration_pct"],
-                "Feed Flow (kg/s)": results["feed_flow"],
-                "Vapor Flow (kg/s)": results["vapor_flow"]
-            })
+    time_min = [t / 60 for t in results["time"]]
+    df = pd.DataFrame({
+        "Time (min)": time_min,
+        "Mass (kg)": results["mass"],
+        "Temperature (°C)": results["temperature_C"],
+        "Salt Concentration (%)": results["concentration_pct"],
+        "Feed Flow (kg/s)": results["feed_flow"],
+        "Vapor Flow (kg/s)": results["vapor_flow"]
+    })
 
-            M_max = 7.7
-            M_min = 5.09
-            T_eb = results["T_eb"] - 273.15
+    M_max = 7.7
+    M_min = 5.09
+    T_eb = results["T_eb"] - 273.15
 
-            # --- Mass plot ---
-            mass_chart = alt.Chart(df).mark_line(color='blue').encode(
-                x=alt.X('Time (min)', title='Time (min)'),
-                y=alt.Y('Mass (kg)', title='Mass (kg)')
-            ).properties(title='Mass in Evaporator')
+    # --- Mass plot ---
+    mass_ymin = np.min(df["Mass (kg)"])
+    mass_ymax = np.max(df["Mass (kg)"]) + 2
 
-            mass_lines = alt.Chart(pd.DataFrame({'y': [M_max, M_min]})).mark_rule(
-                strokeDash=[4, 4], color='gray'
-            ).encode(y='y')
+    mass_chart = alt.Chart(df).mark_line(color='blue').encode(
+        x=alt.X('Time (min)', title='Time (min)'),
+        y=alt.Y('Mass (kg)', title='Mass (kg)', scale=alt.Scale(domain=[mass_ymin, mass_ymax]))
+    ).properties(title='Mass in Evaporator')
 
-            st.altair_chart(mass_chart + mass_lines, use_container_width=True)
+    mass_lines = alt.Chart(pd.DataFrame({'y': [M_max, M_min]})).mark_rule(
+        strokeDash=[4, 4], color='gray'
+    ).encode(y='y')
 
-            # --- Temperature plot with boiling range lines ---
-            temp_chart = alt.Chart(df).mark_line(color='red').encode(
-                x=alt.X('Time (min)', title='Time (min)'),
-                y=alt.Y('Temperature (°C)', title='Temperature (°C)')
-            ).properties(
-                title='Temperature in Evaporator'
-            )
+    st.altair_chart(mass_chart + mass_lines, use_container_width=True)
 
-            # Two lines: T_eb + 3 and T_eb - 5
-            temp_lines = alt.Chart(pd.DataFrame({
-                'y': [T_eb + 3, T_eb - 5]
-            })).mark_rule(
-                strokeDash=[4, 4], color='gray'
-            ).encode(
-                y='y:Q'
-            )
+    # --- Temperature plot ---
+    temp_ymin = np.min(df["Temperature (°C)"])
+    temp_ymax = np.max(df["Temperature (°C)"]) + 2
 
-            st.altair_chart(temp_chart + temp_lines, use_container_width=True)
+    temp_chart = alt.Chart(df).mark_line(color='red').encode(
+        x=alt.X('Time (min)', title='Time (min)'),
+        y=alt.Y('Temperature (°C)', title='Temperature (°C)', scale=alt.Scale(domain=[temp_ymin, temp_ymax]))
+    ).properties(
+        title='Temperature in Evaporator'
+    )
 
-            # --- Salt concentration plot ---
-            conc_chart = alt.Chart(df).mark_line(color='purple').encode(
-                x=alt.X('Time (min)', title='Time (min)'),
-                y=alt.Y('Salt Concentration (%)', title='Concentration (%)')
-            ).properties(title='Salt Concentration in Evaporator')
+    temp_lines = alt.Chart(pd.DataFrame({
+        'y': [T_eb + 3, T_eb - 5]
+    })).mark_rule(
+        strokeDash=[4, 4], color='gray'
+    ).encode(
+        y='y:Q'
+    )
 
-            st.altair_chart(conc_chart, use_container_width=True)
+    st.altair_chart(temp_chart + temp_lines, use_container_width=True)
 
-            # --- Flow plot with legend ---
-            flow_chart = alt.Chart(df).transform_fold(
-                ['Feed Flow (kg/s)', 'Vapor Flow (kg/s)'],
-                as_=['Flow Type', 'Flow']
-            ).mark_line().encode(
-                x=alt.X('Time (min):Q', title='Time (min)'),
-                y=alt.Y('Flow:Q', title='Flow (kg/s)'),
-                color=alt.Color('Flow Type:N', title='Type of Flow')
-            ).properties(
-                title='Feed and Vapor Flow Rates'
-            )
+    # --- Salt concentration plot ---
+    conc_ymin = np.min(df["Salt Concentration (%)"])
+    conc_ymax = np.max(df["Salt Concentration (%)"]) + 2
 
-            st.altair_chart(flow_chart, use_container_width=True)
+    conc_chart = alt.Chart(df).mark_line(color='purple').encode(
+        x=alt.X('Time (min)', title='Time (min)'),
+        y=alt.Y('Salt Concentration (%)', title='Concentration (%)', scale=alt.Scale(domain=[conc_ymin, conc_ymax]))
+    ).properties(title='Salt Concentration in Evaporator')
 
+    st.altair_chart(conc_chart, use_container_width=True)
+
+    # --- Flow plot ---
+    flow_ymin = min(np.min(df["Feed Flow (kg/s)"]), np.min(df["Vapor Flow (kg/s)"]))
+    flow_ymax = max(np.max(df["Feed Flow (kg/s)"]), np.max(df["Vapor Flow (kg/s)"])) + 2
+
+    flow_chart = alt.Chart(df).transform_fold(
+        ['Feed Flow (kg/s)', 'Vapor Flow (kg/s)'],
+        as_=['Flow Type', 'Flow']
+    ).mark_line().encode(
+        x=alt.X('Time (min):Q', title='Time (min)'),
+        y=alt.Y('Flow:Q', title='Flow (kg/s)', scale=alt.Scale(domain=[flow_ymin, flow_ymax])),
+        color=alt.Color('Flow Type:N', title='Type of Flow')
+    ).properties(
+        title='Feed and Vapor Flow Rates'
+    )
+
+    st.altair_chart(flow_chart, use_container_width=True)
