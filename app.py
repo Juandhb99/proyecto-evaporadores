@@ -282,7 +282,6 @@ elif st.session_state.current_window == 'Simulation':
         P1 = st.number_input("Enter the absolute pressure inside the effect (Pa):", min_value=0.0, format="%.2f")
         Ps = st.number_input("Enter the steam absolute pressure (Pa):", min_value=0.0, format="%.2f")
         xf = st.number_input("Enter the concentration of the feed flow (% w/w):", min_value=0.0, format="%.2f")
-        xL = st.number_input("Enter the concentration of the output flow (% w/w):", min_value=0.0, format="%.2f")
                     
         if st.button("Submit", key="submit_simulation"):
             # Validación de entradas
@@ -306,9 +305,6 @@ elif st.session_state.current_window == 'Simulation':
             if Ps < 611.655 or Ps > 2.2064e+07:
                 st.error("Error: The steam pressure must be greater than 611.655 Pa.")
                 valid_inputs = False
-            if xL < 0 or xL > 16:
-                st.error("Error: The concentration of the output flow must be between 0 and 16 % w/w.")
-                valid_inputs = False
             if xf < 0 or xf > 16:
                 st.error("Error: The concentration of the feed flow must be between 0 and 16 % w/w.")
                 valid_inputs = False
@@ -318,14 +314,52 @@ elif st.session_state.current_window == 'Simulation':
 
                 P = 74000  # Atmospheric pressure (Pa)
                 x_f = xf / 100
-                x_L = xL / 100
                 M_salt_init = M_init * x_f
                 total_time = time_s * 60
 
                 results = simulate_evaporation(total_time, M_init, M_salt_init, T_init, P1, Ps, P, x_f, T_f)
                 st.header("Plots for the evaporation process")
                 plot_evaporation_with_altair(results)
+                st.header("For this operation:")
+                last_concentration = results["concentration_pct"][-1]
+                cop_t=(results['total_vapor_evaporated']/results['total_steam_used'])*100
+                summary_data = {
+                    "Variable": [
+                        "Final concentration in the evaporator",
+                        "Total steam used (S)",
+                        "Total vapor evaporated from the solution (V)",
+                        "Coefficient of performance (COP)"
+                    ],
+                    "Value": [
+                        f"{last_concentration:.2f}",
+                        f"{results['total_steam_used']:.2f}",
+                        f"{results['total_vapor_evaporated']:.2f}",
+                        f"{cop_t:.2f}"
+                    ],
+                    "Unit": [
+                        "% w/w",
+                        "kg",
+                        "kg",
+                        "%"
+                    ]
+                }
 
+                df_summary = pd.DataFrame(summary_data)
+
+                # Display the table in HTML with center alignment
+                st.markdown(
+                    df_summary.style
+                        .set_table_styles([
+                            {"selector": "th", "props": [("text-align", "center")]}
+                        ])
+                        .set_properties(**{
+                            "text-align": "center",
+                            "padding": "6px"
+                        })
+                        .hide(axis="index")
+                        .to_html(),
+                    unsafe_allow_html=True
+                )
 
 elif st.session_state.current_window == 'Videos, pictures and repository':
     st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
