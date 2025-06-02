@@ -6,6 +6,10 @@ from Balances.Balances import material_balance, Boling_Point_Elevation, energy_b
 #import fitz  # PyMuPDF
 from PIL import Image
 import time
+from vedo import Mesh, Plotter
+import plotly.graph_objects as go
+
+
 #---------------------------------------------------------------------------------
 st.markdown("""
     <style>
@@ -643,22 +647,40 @@ elif st.session_state.current_window == 'Procedures':
     
 
 elif st.session_state.current_window == 'Dashboard':
-    st.title("Real-Time Dashboard")
-    st.write("This dashboard monitors key system parameters in real-time.")
+    st.title("Visualización 3D del archivo STL")
 
-    # Simulación de datos en tiempo real
-    
+# Cargar el modelo STL
+    mesh = Mesh("EV_V2 v8.stl")
 
-    data = pd.DataFrame(columns=["Time", "Pressure (Pa)", "Temperature (K)"])
-    for i in range(10):  # Simula 10 iteraciones
-        new_row = {
-            "Time": i,
-            "Pressure (Pa)": np.random.uniform(1e5, 2e5),  # Presión aleatoria
-            "Temperature (K)": np.random.uniform(273, 373),  # Temperatura aleatoria
-        }
-        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
-        st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
-        time.sleep(1)
+# Obtener geometría
+    points = mesh.points
+    faces = np.array(mesh.faces()) 
+
+# Separar coordenadas de puntos
+    x, y, z = points[:, 0], points[:, 1], points[:, 2]
+    i, j, k = faces[:, 0], faces[:, 1], faces[:, 2]
+
+    fig = go.Figure(
+        data=[
+            go.Mesh3d(
+                x=x,
+                y=y,
+                z=z,
+                i=i,
+                j=j,
+                k=k,
+                color="lightblue",
+                opacity=1.0,
+        )
+    ]
+)
+
+    fig.update_layout(
+        scene=dict(aspectmode="data"),
+        margin=dict(l=0, r=0, b=0, t=0)
+)
+
+    st.plotly_chart(fig, use_container_width=True)
 
 elif st.session_state.current_window == 'Safety check':
     st.title("🔴 Control de Seguridad del Evaporador")
