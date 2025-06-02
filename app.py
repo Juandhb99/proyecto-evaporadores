@@ -6,8 +6,8 @@ from Balances.Balances import material_balance, Boling_Point_Elevation, energy_b
 #import fitz  # PyMuPDF
 from PIL import Image
 import time
-from vedo import Mesh, Plotter
 import plotly.graph_objects as go
+from stl import mesh as stl_mesh
 
 
 #---------------------------------------------------------------------------------
@@ -648,40 +648,41 @@ elif st.session_state.current_window == 'Procedures':
 
 elif st.session_state.current_window == 'Dashboard':
     st.title("Visualización 3D del archivo STL")
+    # Cargar el archivo STL
+    your_mesh = stl_mesh.Mesh.from_file("EV_V2 v8.stl")
+    # Obtener los vértices (cada fila es un triángulo con 3 vértices)
+    triangles = your_mesh.vectors
 
-# Cargar el modelo STL
-    mesh = Mesh("EV_V2 v8.stl")
+    # Aplanar todos los puntos en una sola lista
+    points = triangles.reshape(-1, 3)
 
-# Obtener geometría
-    points = mesh.points
-    faces = np.array(mesh.faces()) 
+    # Eliminar puntos duplicados y obtener los índices
+    unique_points, indices = np.unique(points, axis=0, return_inverse=True)
 
-# Separar coordenadas de puntos
-    x, y, z = points[:, 0], points[:, 1], points[:, 2]
-    i, j, k = faces[:, 0], faces[:, 1], faces[:, 2]
+    # Crear listas i, j, k para formar los triángulos
+    i = indices[0::3]
+    j = indices[1::3]
+    k = indices[2::3]
 
+    # Extraer coordenadas
+    x, y, z = unique_points[:, 0], unique_points[:, 1], unique_points[:, 2]
+
+    # Crear gráfico 3D
     fig = go.Figure(
-        data=[
-            go.Mesh3d(
-                x=x,
-                y=y,
-                z=z,
-                i=i,
-                j=j,
-                k=k,
-                color="lightblue",
-                opacity=1.0,
-        )
-    ]
+        data=[go.Mesh3d(
+            x=x, y=y, z=z,
+            i=i, j=j, k=k,
+            color='steelblue',
+            opacity=1
+    )]
 )
 
     fig.update_layout(
-        scene=dict(aspectmode="data"),
+        scene=dict(aspectmode='data'),
         margin=dict(l=0, r=0, b=0, t=0)
 )
 
     st.plotly_chart(fig, use_container_width=True)
-
 elif st.session_state.current_window == 'Safety check':
     st.title("🔴 Control de Seguridad del Evaporador")
 
