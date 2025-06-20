@@ -8,6 +8,7 @@ from PIL import Image
 import time
 import plotly.graph_objects as go
 from stl import mesh as stl_mesh
+import streamlit.components.v1 as components
 
 
 #---------------------------------------------------------------------------------
@@ -648,41 +649,23 @@ elif st.session_state.current_window == 'Procedures':
 
 elif st.session_state.current_window == 'Dashboard':
     st.title("Visualización 3D del archivo STL")
-    # Cargar el archivo STL
-    your_mesh = stl_mesh.Mesh.from_file("EV_V2 v8.stl")
-    # Obtener los vértices (cada fila es un triángulo con 3 vértices)
-    triangles = your_mesh.vectors
+    components.html(
+        """
+        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+        <model-viewer 
+            src="https://raw.githubusercontent.com/Juandhb99/proyecto-evaporadores/main/EVAPORADOR_BLEND.glb"
+            alt="Modelo 3D"
+            auto-rotate 
+            camera-controls 
+            background-color="#ffffff"
+            style="width: 100%; height: 600px;">
+        </model-viewer>
+        """,
+        height=650,
+    )
+    
 
-    # Aplanar todos los puntos en una sola lista
-    points = triangles.reshape(-1, 3)
-
-    # Eliminar puntos duplicados y obtener los índices
-    unique_points, indices = np.unique(points, axis=0, return_inverse=True)
-
-    # Crear listas i, j, k para formar los triángulos
-    i = indices[0::3]
-    j = indices[1::3]
-    k = indices[2::3]
-
-    # Extraer coordenadas
-    x, y, z = unique_points[:, 0], unique_points[:, 1], unique_points[:, 2]
-
-    # Crear gráfico 3D
-    fig = go.Figure(
-        data=[go.Mesh3d(
-            x=x, y=y, z=z,
-            i=i, j=j, k=k,
-            color='steelblue',
-            opacity=1
-    )]
-)
-
-    fig.update_layout(
-        scene=dict(aspectmode='data'),
-        margin=dict(l=0, r=0, b=0, t=0)
-)
-
-    st.plotly_chart(fig, use_container_width=True)
+    
 elif st.session_state.current_window == 'Safety check':
     st.title("🔴 Control de Seguridad del Evaporador")
 
