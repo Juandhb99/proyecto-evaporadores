@@ -680,19 +680,19 @@ elif st.session_state.current_window == 'Videos, imagenes y planos':
         st.header(" Documentación visual del equipo")
 
         st.markdown("""
-        This section provides a visual tour of key components and current conditions of the evaporation system. Each image includes a short description to contextualize its importance.
+                    Esta sección brinda un tour visual por los principales componentes y condiciones del sistema de evaporación
         """)
 
         image_data = [
-            ("Feed Tank", "feed.jpg", "Tank that receives the feed stream."),
-            ("Vapor Valve", "EntradaVapor.jpeg", "Primary valve for live steam entry."),
-            ("Second Vapor Valve", "EntradaVapor2.jpeg", "Secondary or bypass valve."),
-            ("Broken Valve", "LlaveDanada.jpeg", "Malfunctioning valve with visible damage."),
-            ("Tapes on the Lines", "ReferenciasMarcadas.jpeg", "Tapes mark operational references."),
-            ("New Balances", "NuevasBalanzas.jpeg", "Upgraded balances for mass measurements."),
-            ("Short Pipe", "TuberiaCorta.jpeg", "Reduced length pipe segment."),
-            ("Dangerous Pipe", "TuberiaPeligrosa.jpeg", "Poorly supported or potentially risky pipe."),
-            ("Manometer", "Manometro.jpeg", "Instrument to measure internal pressure."),
+            ("Tanques de alimento y condensado", "feed.jpg", "Los tanques a continuación presentan el tanque en que se alimenta la solución y donde se recoge el vapor condensado"),
+            ("Valvula de vapor 1", "EntradaVapor.jpeg", "Esta es la primera valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
+            ("Valvula de vapor 2", "EntradaVapor2.jpeg", "Esta es la segunda valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
+            ("Valvula con fallas", "LlaveDanada.jpeg", "Esta valvula presenta fallas visibles "),
+            ("Tapes on the Lines", "ReferenciasMarcadas.jpeg", "Tapes mark operational references. Se recomienda cuidado al manejarla, ya que esta permite el flujo de agua fresca"),
+            ("Balanzas", "NuevasBalanzas.jpeg", "Las balanzas presentadas indican la masa del tanque+su contenido interno"),
+            ("Tubería de salida del condensado", "TuberiaCorta.jpeg", "Este segmento de tubería corresponde a la tubería para vaciar el condensado"),
+            ("Tubería peligrosa y caliente", "TuberiaPeligrosa.jpeg", "Esta tubería es peligrosa, tiene superficies muy calientes"),
+            ("Manometro", "Manometro.jpeg", "Instrumento para medir la presión del vapor, se encuentra presente en varias partes del equipo"),
         ]
 
         # Mostrar en filas de 3 columnas
@@ -868,17 +868,6 @@ elif st.session_state.current_window == 'Procedimientos':
                         "Contiene uso del gemelo, del sistema y demás "
                     )
 
-                with col2:
-                    with open("PreInforme_Agua.pdf", "rb") as file2:
-                        st.download_button(
-                            label="📥 Descargar Preinforme Agua",
-                            data=file2,
-                            file_name="PreInforme_Agua.pdf",
-                            mime="application/pdf"
-                        )
-                    st.caption(
-                        "Ejemplo de preinforme para evaporación con agua y solución salina, incluye balance energético."
-                    )
 
     elif st.session_state.button_clicked == "Recomendaciones":
         
@@ -915,21 +904,30 @@ elif st.session_state.current_window == 'Procedimientos':
     
 
 elif st.session_state.current_window == 'Visualización 3D':
-    st.title("Visualización 3D del evaporador")
+    
+    st.title("Visualización 3D del Evaporador")
     components.html(
-        """
-        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-        <model-viewer 
-            src="https://raw.githubusercontent.com/Juandhb99/proyecto-evaporadores/main/EVAPORADOR_BLEND.glb"
-            alt="Modelo 3D"
-            auto-rotate 
-            camera-controls 
-            background-color="#ffffff"
-            style="width: 100%; height: 600px;">
-        </model-viewer>
-        """,
-        height=900,
-    )
+    """
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+    <model-viewer 
+        src="https://raw.githubusercontent.com/Juandhb99/proyecto-evaporadores/main/Evaporador2.glb"
+        alt="Modelo 3D del Evaporador"
+        auto-rotate
+        camera-controls
+        auto-rotate-delay="1000"
+        rotation-per-second="30deg"
+        environment-image="legacy"
+        exposure="1"
+        shadow-intensity="1"
+        shadow-softness="0.8"
+        style="width: 100%; height: 700px; background-color: #111111;"
+    >
+    </model-viewer>
+    """,
+    height=750,
+)
+
     
 
 elif st.session_state.current_window == 'Safety check':
