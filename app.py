@@ -697,6 +697,10 @@ elif st.session_state.current_window == 'Videos, imagenes y planos':
             ("Tubería de salida del condensado", "TuberiaCorta.jpeg", "Este segmento de tubería corresponde a la tubería para vaciar el condensado"),
             ("Tubería peligrosa y caliente", "TuberiaPeligrosa.jpeg", "Esta tubería es peligrosa, tiene superficies muy calientes"),
             ("Manometro", "Manometro.jpeg", "Instrumento para medir la presión del vapor, se encuentra presente en varias partes del equipo"),
+            ("Tablero de control", "tablero de control.jpg", "Se indican todos los interruptores del sistema"),
+            ("Trampa", "TRAMPAS.jpg","Clave para la operación"),
+            ("Evaporadores", "EVAPORADORES.jpg", "Ambos sitemas de operación"),
+            ("Bombas del sitema", "BOMBAS.jpg", "4 bombas, correspondientes a los evaporadores, el alimento y el vacio"),
         ]
 
         # Mostrar en filas de 3 columnas
