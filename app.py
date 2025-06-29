@@ -139,6 +139,8 @@ def Visualización_3D():
 def Safetycheck():
     st.session_state.current_window = 'Safety check'
 
+def Encuesta_al_usuario():
+    st.session_state.current_window = 'Encuesta al usuario'
 
 def generate_simulation_pdf(sim_inputs, sim_results, df_results):
     pdf = FPDF()
@@ -207,6 +209,7 @@ st.sidebar.button("Videos, imagenes y planos", on_click=visuals)
 st.sidebar.button("Procedimientos", on_click=procedures)
 st.sidebar.button("Visualización 3D", on_click=Visualización_3D)
 st.sidebar.button("Safety check",on_click=Safetycheck)
+st.sidebar.button("Encuesta al usuario",on_click=Encuesta_al_usuario)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
 if st.session_state.current_window == 'Información general':
@@ -645,7 +648,8 @@ elif st.session_state.current_window == 'Videos, imagenes y planos':
     if st.session_state.button_clicked == "Videos": 
         
         st.subheader("Video tutorial de operación")
-        
+        st.title("Video de operación del evaporador")
+        st.video("https://youtu.be/0eoxaMteWHA")
 
     elif st.session_state.button_clicked == "Planos del equipo":
 
@@ -688,7 +692,7 @@ elif st.session_state.current_window == 'Videos, imagenes y planos':
             ("Valvula de vapor 1", "EntradaVapor.jpeg", "Esta es la primera valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
             ("Valvula de vapor 2", "EntradaVapor2.jpeg", "Esta es la segunda valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
             ("Valvula con fallas", "LlaveDanada.jpeg", "Esta valvula presenta fallas visibles "),
-            ("Tapes on the Lines", "ReferenciasMarcadas.jpeg", "Tapes mark operational references. Se recomienda cuidado al manejarla, ya que esta permite el flujo de agua fresca"),
+            ("Tauberías señalizadas", "ReferenciasMarcadas.jpeg", "Tapes mark operational references. Se recomienda cuidado al manejarla, ya que esta permite el flujo de agua fresca"),
             ("Balanzas", "NuevasBalanzas.jpeg", "Las balanzas presentadas indican la masa del tanque+su contenido interno"),
             ("Tubería de salida del condensado", "TuberiaCorta.jpeg", "Este segmento de tubería corresponde a la tubería para vaciar el condensado"),
             ("Tubería peligrosa y caliente", "TuberiaPeligrosa.jpeg", "Esta tubería es peligrosa, tiene superficies muy calientes"),
@@ -923,6 +927,32 @@ elif st.session_state.current_window == 'Visualización 3D':
         shadow-softness="0.8"
         style="width: 100%; height: 700px; background-color: #111111;"
     >
+
+    <!-- Hotspot 1 -->
+    <div slot="hotspot-1" class="hotspot" 
+         data-position="0.5 0.1 -0.2" 
+         data-normal="0 0 1">
+      <div class="annotation">Tanque de alimentación</div>
+    </div>
+
+    <!-- Hotspot 2 -->
+    <div slot="hotspot-2" class="hotspot" 
+         data-position="0.3 0.35 -0.05" 
+         data-normal="0 1 0">
+      <div class="annotation">Entrada de vapor</div>
+    </div>
+
+    <style>
+      .hotspot {
+        background: rgba(0, 123, 255, 0.8);
+        border-radius: 10px;
+        padding: 4px 8px;
+        color: white;
+        font-size: 12px;
+        pointer-events: none;
+      }
+    </style>
+
     </model-viewer>
     """,
     height=750,
@@ -931,7 +961,7 @@ elif st.session_state.current_window == 'Visualización 3D':
     
 
 elif st.session_state.current_window == 'Safety check':
-    st.title("🔴 Control de Seguridad del Evaporador")
+    st.title("Control de Seguridad del Evaporador")
 
     # *Rangos de Seguridad*
     TEMP_MIN, TEMP_MAX = 15, 100  # Temperatura en °C (ejemplo)
@@ -989,6 +1019,14 @@ elif st.session_state.current_window == 'Safety check':
     else:
         st.info("No se han registrado alertas hasta el momento.")
 
+elif st.session_state.current_window == 'Encuesta al usuario':
+    st.title("Encuesta de satisfacción al usuario")
+    st.markdown("Por favor completa la siguiente encuesta sin salir del entorno:")
+    components.iframe(
+    src="https://docs.google.com/forms/d/e/1FAIpQLSeRHoNLIRiqlcixGXDPkIhoBb383q5Lxz7jdYVlN_fLXoZNvA/viewform?embedded=true",
+    width=700,
+    height=800
+)
 # Llamar a la función para mostrar el botón al final de la página
 show_help_button()
 
