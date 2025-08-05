@@ -1028,8 +1028,8 @@ elif st.session_state.current_window == 'Encuesta al usuario':
     st.markdown("Por favor completa la siguiente encuesta sin salir del entorno:")
     components.iframe(
     src="https://docs.google.com/forms/d/e/1FAIpQLSeRHoNLIRiqlcixGXDPkIhoBb383q5Lxz7jdYVlN_fLXoZNvA/viewform?embedded=true",
-    width=700,
-    height=7000
+    width=800,
+    height=9000
 )
 # Llamar a la función para mostrar el botón al final de la página
 show_help_button()
