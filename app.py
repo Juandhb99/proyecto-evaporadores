@@ -6,6 +6,14 @@ from Balances.Balances import material_balance, Boling_Point_Elevation, energy_b
 #import fitz  # PyMuPDF
 from PIL import Image
 import time
+import plotly.graph_objects as go
+from stl import mesh as stl_mesh
+import streamlit.components.v1 as components
+from fpdf import FPDF
+import matplotlib.pyplot as plt
+import tempfile
+import os
+
 #---------------------------------------------------------------------------------
 st.markdown("""
     <style>
@@ -63,53 +71,149 @@ def centered_image(image_path, width):
 #----------------------------------------------------------------------------
 
 if 'current_window' not in st.session_state:
-    st.session_state.current_window = 'General information'
+    st.session_state.current_window = 'Información general'
 
 # Functions to change the window
 def go_to_home():
-    st.session_state.current_window = 'General information'
+    st.session_state.current_window = 'Información general'
+import streamlit as st
+
 def show_help_button():
-    st.markdown(
-        """
-        <div style='position: fixed; bottom: 10px; width: 100%; text-align: center; z-index: 1000;'>
-            <button style='background-color: #1E90FF; color: white; border: none; padding: 10px 20px; 
-            font-size: 16px; border-radius: 5px; cursor: pointer;' 
-            onclick="window.alert('This is the help button. It provides guidance for navigating the interface.')">
-                Help
-            </button>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Inicializar el estado si no existe
+    if "show_help" not in st.session_state:
+        st.session_state.show_help = False
+
+    # CSS para el botón flotante
+    st.markdown("""
+        <style>
+        #help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Botón como HTML + Streamlit callback
+    clicked = st.button("Help", key="help_button", help="Click for guidance")
+
+    if clicked:
+        st.session_state.show_help = not st.session_state.show_help
+
+    if st.session_state.show_help:
+        with st.expander("Guía de la Interfaz del Gemelo Digital"):
+            st.markdown("""
+            Usa el menú de la izquierda para navegar por el gemelo digital:
+
+            - **Información General:** visión general y objetivos de la unidad de evaporación.
+            - **Simulación:** ejecuta casos en estado estacionario y transitorio.
+            - **Videos, Imágenes y Repositorio:** revisa material y ejecuciones pasadas.
+            - **Procedimientos:** instrucciones de laboratorio y pasos operativos.
+            - **Visualización 3D:** explora un modelo espacial del equipo.
+            - **Verificación de Seguridad:** lista de chequeo previa a la operación para concientización estudiantil.
+            """)
+
+
 
 def simulation_module():
     st.session_state.current_window = 'Simulation'
 
 def procedures():
-    st.session_state.current_window = 'Procedures'
+    st.session_state.current_window = 'Procedimientos'
 
 def visuals():
-    st.session_state.current_window = 'Videos, pictures and repository'
+    st.session_state.current_window = 'Videos, imagenes y planos'
 
 
-def Dashboard():
-    st.session_state.current_window = 'Dashboard'
+def Visualización_3D():
+    st.session_state.current_window = 'Visualización 3D'
 
 def Safetycheck():
     st.session_state.current_window = 'Safety check'
 
+def Encuesta_al_usuario():
+    st.session_state.current_window = 'Encuesta al usuario'
+
+def generate_simulation_pdf(sim_inputs, sim_results, df_results):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.set_title("Simulation Report")
+
+    # Título
+    pdf.set_font("Arial", style="B", size=14)
+    pdf.cell(0, 10, "Evaporator Simulation Summary", ln=True, align="C")
+    pdf.ln(5)
+
+    # Datos de entrada
+    pdf.set_font("Arial", style="", size=12)
+    pdf.cell(0, 10, "Input Conditions:", ln=True)
+    for key, value in sim_inputs.items():
+        pdf.cell(0, 8, f"- {key}: {value}", ln=True)
+
+    pdf.ln(5)
+
+    # KPIs
+    pdf.cell(0, 10, "Key Performance Indicators (KPIs):", ln=True)
+    for key, value in sim_results.items():
+        pdf.cell(0, 8, f"- {key}: {value}", ln=True)
+
+    pdf.ln(5)
+
+    # Gráfico de concentración
+    fig, ax = plt.subplots()
+    ax.plot(df_results["time"], df_results["concentration_pct"], label="Concentration")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Concentration (% w/w)")
+    ax.set_title("Concentration Profile")
+    ax.grid(True)
+
+    # Guardar imagen temporalmente
+    tmpdir = tempfile.gettempdir()
+    img_path = os.path.join(tmpdir, "temp_plot.png")
+    plt.savefig(img_path)
+    plt.close()
+
+    # Agregar imagen
+    pdf.image(img_path, x=10, w=180)
+
+    # Observaciones
+    pdf.ln(10)
+    pdf.cell(0, 10, "Remarks:", ln=True)
+    if float(sim_results["COP (%)"]) > 70:
+        pdf.multi_cell(0, 8, "Excellent energy performance. This condition shows high efficiency.")
+    elif float(sim_results["COP (%)"]) > 50:
+        pdf.multi_cell(0, 8, "Acceptable performance. The operation is moderately efficient.")
+    else:
+        pdf.multi_cell(0, 8, "Low performance. Consider adjusting feed or steam parameters.")
+
+    # Guardar PDF
+    output_path = os.path.join(tmpdir, "simulation_summary.pdf")
+    pdf.output(output_path)
+    return output_path
+
 #  Navigation menu options
 st.sidebar.title("Navigation Menu")
-st.sidebar.button("General information", on_click=go_to_home)
+st.sidebar.button("Información general", on_click=go_to_home)
 st.sidebar.button("Simulation", on_click=simulation_module)
-st.sidebar.button("Videos, pictures and repository", on_click=visuals)
-st.sidebar.button("Procedures", on_click=procedures)
-st.sidebar.button("Dashboard", on_click=Dashboard)
+st.sidebar.button("Videos, imagenes y planos", on_click=visuals)
+st.sidebar.button("Procedimientos", on_click=procedures)
+st.sidebar.button("Visualización 3D", on_click=Visualización_3D)
 st.sidebar.button("Safety check",on_click=Safetycheck)
+st.sidebar.button("Encuesta al usuario",on_click=Encuesta_al_usuario)
 #-------------------------------------------------------------------------------------
 # Content based on the window selected in the navigation menu
-if st.session_state.current_window == 'General information':
-    st.title("Chemical Engineering Lab - Multieffect Evaporator Digital Twin")
+if st.session_state.current_window == 'Información general':
+    st.title("Gemelo digital-Evaporador multiefecto- Laboratorios de ingeniería química")
     centered_image('eq.jpg',width=600)
 
     st.write("""El banco de evaporadores en los laboratorios de ingeniería química ha sido seleccionado como la 
@@ -117,11 +221,31 @@ if st.session_state.current_window == 'General information':
              papel fundamental en los experimentos relacionados con la concentración de soluciones, especialmente salmueras,
              debido a su capacidad para simular procesos industriales a escala de laboratorio.""")
     
-    st.write("""The evaporator bank in the chemical engineering laboratories has been chosen as the cornerstone 
-             to inaugurate the era of digital models in the faculty. This equipment plays a fundamental role 
-             in experiments related to the concentration of solutions, especially brines, due to its ability to 
-             simulate industrial processes on a laboratory scale.""")
+    st.markdown("""
+        ---
 
+        ### Objetivos de aprendizaje
+
+        - Comprender el principio de funcionamiento de un evaporador multiefecto.
+        - Identificar las variables de operación críticas en procesos de concentración.
+        - Analizar balances de materia y energía aplicados a evaporación.
+        - Evaluar la eficiencia térmica (COP) bajo distintas condiciones.
+        - Comparar resultados experimentales y simulados con soporte visual e interactivo.
+
+        ---
+
+        ### Aplicaciones industriales reales
+
+        Este tipo de evaporadores se encuentra comúnmente en industrias como:
+
+        - **Alimentaria**: concentración de jugos, leche, extractos naturales.
+        - **Química**: recuperación de sales, concentración de soluciones inorgánicas.
+        - **Farmacéutica**: preparación de compuestos sensibles a la temperatura.
+        - **Tratamiento de aguas**: desalinización por evaporación.
+
+        ---
+        """)
+    
 elif st.session_state.current_window == 'Simulation':
 
     # Define the kind of simulation to be done
@@ -271,6 +395,15 @@ elif st.session_state.current_window == 'Simulation':
                     st.write(results_df_display.to_html(), unsafe_allow_html=True)
     
     if simulation_type == "Transient state":
+        # Inicializar repositorio si no existe
+        if 'sim_repo' not in st.session_state:
+            try:
+                df_preloaded = pd.read_csv("evaporation_repository.csv")
+                st.session_state.sim_repo = df_preloaded.to_dict(orient='records')
+                st.success(" Preloaded simulation repository loaded.")
+            except FileNotFoundError:
+                st.session_state.sim_repo = []
+
         st.header("Trasient state simulation")
         st.write("This simulation is prepared for salt-water mixtures")
         # Asking for values from the user as numbers
@@ -345,6 +478,23 @@ elif st.session_state.current_window == 'Simulation':
                 }
 
                 df_summary = pd.DataFrame(summary_data)
+                
+
+                from datetime import datetime
+
+# Guardar esta simulación en el repositorio
+                st.session_state.sim_repo.append({
+                "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "Initial mass (kg)": M_init,
+                "Feed temperature (K)": T_f,
+                "Steam pressure (Pa)": Ps,
+                "Effect pressure (Pa)": P1,
+                "Feed concentration (% w/w)": xf,
+                "Final concentration (% w/w)": last_concentration,
+                "Total steam used (kg)": results['total_steam_used'],
+                "Total vapor evaporated (kg)": results['total_vapor_evaporated'],
+                "COP (%)": cop_t
+                })
 
                 # Display the table in HTML with center alignment
                 st.markdown(
@@ -361,23 +511,125 @@ elif st.session_state.current_window == 'Simulation':
                     unsafe_allow_html=True
                 )
 
-elif st.session_state.current_window == 'Videos, pictures and repository':
-    st.markdown("""This section features relevant images related to the tanks, valves, and components of the evaporation system. 
-    These images provide visual support to better understand the operation of the equipment, identify potential failures, and 
-    reinforce usage recommendations. Through these visual representations, the goal is to simplify the technical interpretation 
-    of key aspects of the system, from tank feed to critical equipment connections.""" )
+
+                # Convertir el diccionario de resultados a DataFrame para exportar
+                df_results = pd.DataFrame(results)
+
+                # Botón de descarga de los datos simulados
+                st.markdown("###  Export Options")
+                st.markdown("Download the summary and full time series of the evaporation simulation:")
+
+                csv_results = df_results.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                label=" Download simulation data (full time series)",
+                data=csv_results,
+                file_name='evaporation_timeseries.csv',
+                mime='text/csv'
+                )
+                
+                with st.expander("Simulation results"):
+                    tab1, tab2 = st.tabs(["Summary graphic", " Previous Simulations"])
+
+                    with tab1:
+                        # Gráfico resumen
+                        if st.session_state.sim_repo:
+                            import pandas as pd
+                            import plotly.express as px
+                            df_repo = pd.DataFrame(st.session_state.sim_repo)
+                            fig = px.scatter_3d(
+                                df_repo,
+                                x="Effect pressure (Pa)",
+                                y="Feed temperature (K)",
+                                z="COP (%)",
+                                color="Feed concentration (% w/w)",
+                                size="Total vapor evaporated (kg)",
+                                hover_name="Timestamp",
+                                title="COP as function of Effect Pressure and Feed Concentration",
+                            )
+                            st.plotly_chart(fig, use_container_width=True)
+
+                            csv_repo = df_repo.to_csv(index=False).encode('utf-8')
+                            st.download_button(
+                                label="Export repository as CSV",
+                                data=csv_repo,
+                                file_name='evaporation_repository.csv',
+                                mime='text/csv'
+                            )
+
+                    with tab2:
+                        # Resultados por simulación (NO usar expander aquí)
+                        for i, sim in enumerate(st.session_state.sim_repo):
+                            st.markdown(f"### Simulation {i+1} – {sim['Timestamp']}")
+                            col1, col2, col3 = st.columns(3)
+                            col1.metric("COP (%)", f"{sim['COP (%)']:.2f}")
+                            col2.metric("Final Conc. (% w/w)", f"{sim['Final concentration (% w/w)']:.2f}")
+
+                            status = (
+                                "🟢 Excellent" if sim['COP (%)'] > 70
+                                else "🟠 Aceptable" if sim['COP (%)'] > 50
+                                else "🔴 Bad"
+                            )
+                            col3.markdown(f"**Status:** {status}")
+
+                            st.markdown(f"""
+                            - **Initial mass:** {sim['Initial mass (kg)']} kg  
+                            - **Feed T:** {sim['Feed temperature (K)']} K  
+                            - **Steam P:** {sim['Steam pressure (Pa)']} Pa  
+                            - **Effect P:** {sim['Effect pressure (Pa)']} Pa  
+                            - **Feed concentration:** {sim['Feed concentration (% w/w)']} %  
+                            - **Total steam used:** {sim['Total steam used (kg)']} kg  
+                            - **Vapor evaporated:** {sim['Total vapor evaporated (kg)']} kg
+                            """)
+
+                # PDF actual
+                sim_inputs = {
+                    "Initial mass (kg)": M_init,
+                    "Feed temperature (K)": T_f,
+                    "Steam pressure (Pa)": Ps,
+                    "Effect pressure (Pa)": P1,
+                    "Feed concentration (% w/w)": xf,
+                    "Simulation time (min)": time_s,
+                }
+
+                sim_results = {
+                    "Final concentration (% w/w)": f"{last_concentration:.2f}",
+                    "Total steam used (kg)": f"{results['total_steam_used']:.2f}",
+                    "Total vapor evaporated (kg)": f"{results['total_vapor_evaporated']:.2f}",
+                    "COP (%)": f"{cop_t:.2f}",
+                }
+
+                pdf_path = generate_simulation_pdf(sim_inputs, sim_results, df_results)
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label="Download Simulation Report (PDF)",
+                        data=f,
+                        file_name="simulation_summary.pdf",
+                        mime="application/pdf"
+                    )
+
+
+
+
+elif st.session_state.current_window == 'Videos, imagenes y planos':
+    st.markdown("""Esta sección presenta imágenes relevantes relacionadas con los tanques, válvulas y componentes del sistema de evaporación. 
+                Estas imágenes proporcionan un soporte visual para comprender mejor el funcionamiento del equipo, identificar posibles fallas y 
+                reforzar las recomendaciones de uso. A través de estas representaciones visuales, el objetivo es simplificar la interpretación técnica de aspectos 
+                clave del sistema, desde la alimentación del tanque hasta las conexiones críticas del equipo.""" )
  # Buttons centered and in the same leves
+    if "button_clicked" not in st.session_state:
+        st.session_state.button_clicked = None 
+
     col4, col5,col6 = st.columns(3)
     with col4:
         if st.button("Videos", key="videos", help="Videos", use_container_width=True):
             st.session_state.button_clicked = "Videos"
             
     with col5:
-        if st.button("Pictures", key="pictures", help="Pictures", use_container_width=True):
-            st.session_state.button_clicked = "Pictures"
+        if st.button("Imágenes", key="imágenes", help="Imágenes", use_container_width=True):
+            st.session_state.button_clicked = "Imágenes"
     with col6:
-        if st.button("Repository", key="repository", help="Repository", use_container_width=True):
-            st.session_state.button_clicked = "Repository"   
+        if st.button("Planos del equipo", key="planos del equipo", help="Planos del equipo", use_container_width=True):
+            st.session_state.button_clicked = "Planos del equipo"   
 
             # Specific color whe the mouse hovers
     st.markdown("""
@@ -393,23 +645,13 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
         </style>
     """, unsafe_allow_html=True)
 
-    if st.session_state.button_clicked == "Videos":
-        st.subheader("Feed Tank")
-        centered_image(r"feed.jpg", 400)
-    elif st.session_state.button_clicked == "Repository":
-        # Buttons centered and in the same leves
-                
-            col7, col8,col9 = st.columns(3)
-            with col7:
-                if st.button("Blueprints", key="blueprints", help="Blueprints", use_container_width=True):
-                    st.session_state.button_clicked = "Blueprints"
-                    
-            with col8:
-                if st.button("Report", key="report", help="Report", use_container_width=True):
-                    st.session_state.button_clicked = "Report"
-            with col9:
-                if st.button("Prelab", key="prelab", help="Prelab", use_container_width=True):
-                    st.session_state.button_clicked = "Prelab"   
+    if st.session_state.button_clicked == "Videos": 
+        
+        st.subheader("Video tutorial de operación")
+        st.title("Video de operación del evaporador")
+        st.video("https://youtu.be/0eoxaMteWHA")
+
+    elif st.session_state.button_clicked == "Planos del equipo":
 
                     # Specific color whe the mouse hovers
             st.markdown("""
@@ -424,8 +666,9 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
                 }
                 </style>
             """, unsafe_allow_html=True)
-            if st.session_state.button_clicked == "Blueprints":
-                    st.subheader("Blueprints")
+
+            if st.session_state.button_clicked == "Planos del equipo":
+                    st.subheader("Planos del equipo")
                     centered_image(r"Evaporador - planos_page-0001.jpg", 950)
                     centered_image(r"Evaporador - planos_page-0002.jpg", 950)
                     centered_image(r"Evaporador - planos_page-0003.jpg", 950)
@@ -435,40 +678,45 @@ elif st.session_state.current_window == 'Videos, pictures and repository':
                     centered_image(r"Evaporador - planos_page-0007.jpg", 950)
                     centered_image(r"Evaporador - planos_page-0008.jpg", 950)
 
-    elif st.session_state.button_clicked == "Pictures":
-            st.header("Tanks")
-            # Feed Tank
-            st.subheader("Feed Tank")
-            centered_image(r"feed.jpg", 400)
-            # Condensed Steam Tank
-            st.subheader("Vapor valve")
-            centered_image(r"EntradaVapor.jpeg", 400)
-            st.subheader("Second vapor valve")
-            centered_image(r"EntradaVapor2.jpeg", 400)
-            # Condensed Vapor Tank
-            st.subheader("Broken valve")
-            centered_image(r"LlaveDanada.jpeg", 400)
+            
 
-            st.subheader("Tapes on the lines")
-            centered_image(r"ReferenciasMarcadas.jpeg", 400)
+    elif st.session_state.button_clicked == "Imágenes":
+        st.header(" Documentación visual del equipo")
 
-            st.subheader("New balances")
-            centered_image(r"NuevasBalanzas.jpeg", 400)
+        st.markdown("""
+                    Esta sección brinda un tour visual por los principales componentes y condiciones del sistema de evaporación
+        """)
 
-            st.subheader("Short pipe")
-            centered_image(r"TuberiaCorta.jpeg", 400)
+        image_data = [
+            ("Tanques de alimento y condensado", "feed.jpg", "Los tanques a continuación presentan el tanque en que se alimenta la solución y donde se recoge el vapor condensado"),
+            ("Valvula de vapor 1", "EntradaVapor.jpeg", "Esta es la primera valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
+            ("Valvula de vapor 2", "EntradaVapor2.jpeg", "Esta es la segunda valvula a abrir para permitir el flujo de vapor vivo al sistema de evaporación"),
+            ("Valvula con fallas", "LlaveDanada.jpeg", "Esta valvula presenta fallas visibles "),
+            ("Tauberías señalizadas", "ReferenciasMarcadas.jpeg", "Tapes mark operational references. Se recomienda cuidado al manejarla, ya que esta permite el flujo de agua fresca"),
+            ("Balanzas", "NuevasBalanzas.jpeg", "Las balanzas presentadas indican la masa del tanque+su contenido interno"),
+            ("Tubería de salida del condensado", "TuberiaCorta.jpeg", "Este segmento de tubería corresponde a la tubería para vaciar el condensado"),
+            ("Tubería peligrosa y caliente", "TuberiaPeligrosa.jpeg", "Esta tubería es peligrosa, tiene superficies muy calientes"),
+            ("Manometro", "Manometro.jpeg", "Instrumento para medir la presión del vapor, se encuentra presente en varias partes del equipo"),
+            ("Tablero de control", "tablero de control.jpg", "Se indican todos los interruptores del sistema"),
+            ("Trampa", "TRAMPAS.jpg","Clave para la operación"),
+            ("Evaporadores", "EVAPORADORES.jpg", "Ambos sitemas de operación"),
+            ("Bombas del sitema", "BOMBAS.jpg", "4 bombas, correspondientes a los evaporadores, el alimento y el vacio"),
+        ]
 
-            st.subheader("Dangerous pipe")
-            centered_image(r"TuberiaPeligrosa.jpeg", 400)
+        # Mostrar en filas de 3 columnas
+        for i in range(0, len(image_data), 3):
+            cols = st.columns(3)
+            for col, (title, img_path, caption) in zip(cols, image_data[i:i+3]):
+                with col:
+                    st.image(img_path, caption=f" {caption}", use_column_width=True)
+                    st.markdown(f"**{title}**", unsafe_allow_html=True)
 
-            st.subheader("Manometer")
-            centered_image(r"Manometro.jpeg", 400)
 
 
    
 
    
-elif st.session_state.current_window == 'Procedures':
+elif st.session_state.current_window == 'Procedimientos':
     st.title("Procesos importantes")
     st.write("""En esta sección presione el botón de la información que desea consultar""")
     # Create columns to display the buttons
@@ -606,7 +854,28 @@ elif st.session_state.current_window == 'Procedures':
             st.write("5. Desconectar el enchufe trifásico.")
             st.write("6. Cerrar las válvulas de paso de agua.")
             st.write("7. Vaciar todos los tanques, incluyendo el cuerpo del efecto.")
-            
+        
+            with st.expander("Manual de operación y respositorio de prácticas anteriores"):
+                st.markdown("###Documentos disponibles")
+                st.write(
+                    "Estos documentos corresponden a manual de operación del gemelo digital "
+                    "Puedes usarlos como guía para estructurar tus propios informes."
+                )
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    with open("Manual_de_uso (1).pdf", "rb") as file1:
+                        st.download_button(
+                            label=" Descargar Manual de operación",
+                            data=file1,
+                            file_name="Manual_de_uso (1).pdf",
+                            mime="application/pdf"
+                        )
+                    st.caption(
+                        "Contiene uso del gemelo, del sistema y demás "
+                    )
+
 
     elif st.session_state.button_clicked == "Recomendaciones":
         
@@ -642,26 +911,61 @@ elif st.session_state.current_window == 'Procedures':
         centered_image(r"Diagrama de flujo_OperacionAGUA.png", 950)
     
 
-elif st.session_state.current_window == 'Dashboard':
-    st.title("Real-Time Dashboard")
-    st.write("This dashboard monitors key system parameters in real-time.")
+elif st.session_state.current_window == 'Visualización 3D':
+    
+    st.title("Visualización 3D del Evaporador")
+    components.html(
+    """
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
-    # Simulación de datos en tiempo real
+    <model-viewer 
+        src="https://raw.githubusercontent.com/Juandhb99/proyecto-evaporadores/main/Evaporador2.glb"
+        alt="Modelo 3D del Evaporador"
+        auto-rotate
+        camera-controls
+        auto-rotate-delay="1000"
+        rotation-per-second="30deg"
+        environment-image="legacy"
+        exposure="1"
+        shadow-intensity="1"
+        shadow-softness="0.8"
+        style="width: 100%; height: 700px; background-color: #111111;"
+    >
+
+    <!-- Hotspot 1 -->
+    <div slot="hotspot-1" class="hotspot" 
+         data-position="0.5 0.1 -0.2" 
+         data-normal="0 0 1">
+      <div class="annotation">Tanque de alimentación</div>
+    </div>
+
+    <!-- Hotspot 2 -->
+    <div slot="hotspot-2" class="hotspot" 
+         data-position="0.3 0.35 -0.05" 
+         data-normal="0 1 0">
+      <div class="annotation">Entrada de vapor</div>
+    </div>
+
+    <style>
+      .hotspot {
+        background: rgba(0, 123, 255, 0.8);
+        border-radius: 10px;
+        padding: 4px 8px;
+        color: white;
+        font-size: 12px;
+        pointer-events: none;
+      }
+    </style>
+
+    </model-viewer>
+    """,
+    height=750,
+)
+
     
 
-    data = pd.DataFrame(columns=["Time", "Pressure (Pa)", "Temperature (K)"])
-    for i in range(10):  # Simula 10 iteraciones
-        new_row = {
-            "Time": i,
-            "Pressure (Pa)": np.random.uniform(1e5, 2e5),  # Presión aleatoria
-            "Temperature (K)": np.random.uniform(273, 373),  # Temperatura aleatoria
-        }
-        data = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
-        st.line_chart(data[["Pressure (Pa)", "Temperature (K)"]])
-        time.sleep(1)
-
 elif st.session_state.current_window == 'Safety check':
-    st.title("🔴 Control de Seguridad del Evaporador")
+    st.title("Control de Seguridad del Evaporador")
 
     # *Rangos de Seguridad*
     TEMP_MIN, TEMP_MAX = 15, 100  # Temperatura en °C (ejemplo)
@@ -671,16 +975,16 @@ elif st.session_state.current_window == 'Safety check':
 
     # *Inputs de usuario*
     st.sidebar.header("Parámetros de Operación")
-    temperature = st.sidebar.number_input("🌡️ Temperatura en el efecto (°C)")
-    pressure = st.sidebar.number_input("💨 Presión en el efecto (Pa)")
-    S_presure = st.sidebar.number_input("♨️ Presión del vapor de la caldera (psig)")
-    V_presure = st.sidebar.number_input("💨 Presión manométrica de vacío (bar)",max_value=0.0)
+    temperature = st.sidebar.number_input(" Temperatura en el efecto (°C)")
+    pressure = st.sidebar.number_input(" Presión en el efecto (Pa)")
+    S_presure = st.sidebar.number_input(" Presión del vapor de la caldera (psig)")
+    V_presure = st.sidebar.number_input(" Presión manométrica de vacío (bar)",max_value=0.0)
 
     # *Registro de Alertas*
     alerts = []
 
     # *Verificación de Seguridad*
-    st.subheader("📊 Estado del Sistema")
+    st.subheader(" Estado del Sistema")
 
     if temperature < TEMP_MIN:
         alerts.append(f"⚠️ *Temperatura muy baja*: {temperature} °C (mínimo permitido {TEMP_MIN} °C)")
@@ -719,7 +1023,16 @@ elif st.session_state.current_window == 'Safety check':
     else:
         st.info("No se han registrado alertas hasta el momento.")
 
+elif st.session_state.current_window == 'Encuesta al usuario':
+    st.title("Encuesta de satisfacción al usuario")
+    st.markdown("Por favor completa la siguiente encuesta sin salir del entorno:")
+    components.iframe(
+    src="https://docs.google.com/forms/d/e/1FAIpQLSeRHoNLIRiqlcixGXDPkIhoBb383q5Lxz7jdYVlN_fLXoZNvA/viewform?embedded=true",
+    width=800,
+    height=9000
+)
 # Llamar a la función para mostrar el botón al final de la página
 show_help_button()
+
 #streamlit run app.py
 
